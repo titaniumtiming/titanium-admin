@@ -1,11 +1,26 @@
-import { AdminTable, columns } from "@/components/admin-table";
-import { api } from "@/trpc/server";
+import { AdminTable } from "@/components/admin-table";
+import { SyncButton } from "@/components/sync-button";
+import { Button } from "@/components/ui/button";
+import { Pencil1Icon } from "@radix-ui/react-icons";
 
 export default async function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center  text-white">
-      <div className="container mx-auto py-10">
+    <main className="flex min-h-screen flex-col items-center justify-center  ">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <div className="flex gap-1">
+            <h2 className="text-2xl font-bold tracking-tight">
+              Race Name (ID)
+            </h2>
+            <Button variant="ghost" size="icon">
+              <Pencil1Icon className="h-4 w-4" />
+            </Button>
+          </div>
+          <SyncButton />
+        </div>
         <AdminTable />
+        {/* <div className="container mx-auto py-10">
+        </div> */}
       </div>
     </main>
   );
