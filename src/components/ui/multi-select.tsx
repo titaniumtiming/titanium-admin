@@ -164,15 +164,12 @@ interface MultiSelectProps {
   onChange: React.Dispatch<React.SetStateAction<string[]>>;
   className?: string;
   selectAll: boolean;
+  // IMPORTANT: need the onBlur to be able to submit the form
+  onBlur?: () => void;
 }
 
-function MultiSelect({
-  options,
-  selected = [],
-  onChange,
-  className,
-  selectAll,
-}: MultiSelectProps) {
+const MultiSelect = React.forwardRef((props: MultiSelectProps, ref) => {
+  const { options, selected, onChange, className, selectAll, onBlur } = props;
   const [open, setOpen] = React.useState(false);
   const [allSelected, setAllSelected] = React.useState(false);
 
@@ -226,7 +223,7 @@ function MultiSelect({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-        <Command className={className}>
+        <Command className={className} onBlur={onBlur} ref={ref as any}>
           <CommandInput placeholder="Search ..." />
 
           <CommandGroup className="max-h-64 overflow-auto">
@@ -266,6 +263,8 @@ function MultiSelect({
       </PopoverContent>
     </Popover>
   );
-}
+});
+
+MultiSelect.displayName = "MultiSelect";
 
 export { MultiSelect };

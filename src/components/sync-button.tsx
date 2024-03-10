@@ -1,31 +1,29 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useGlobalStore } from "@/store";
 
 export interface SyncButtonProps {}
 
 export function SyncButton(props: SyncButtonProps) {
   const {} = props;
 
-  const [status, setStatus] = useState("idle");
+  const syncEnabled = useGlobalStore((state) => state.syncEnabled);
+  const enableSync = useGlobalStore((state) => state.enableSync);
+  const disableSync = useGlobalStore((state) => state.disableSync);
 
   return (
     <>
-      {/* <div className="flex items-center gap-1"> */}
-      {/* <span>status = {status === "idle" ? "idle" : "active"}</span> */}
-
       <Button
         className="py-1"
         onClick={() => {
-          setStatus((prev) => {
-            if (prev === "idle") {
-              return "pending";
-            }
-            return "idle";
-          });
+          if (syncEnabled) {
+            disableSync();
+          } else {
+            enableSync();
+          }
         }}
       >
-        {status === "idle" ? "Start " : "Stop "}
+        {syncEnabled ? "Stop " : "Start "}
         sync
       </Button>
       {/* </div> */}
