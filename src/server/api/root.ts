@@ -1,4 +1,3 @@
-import { type Payment } from "@/components/admin-table";
 import { postRouter } from "@/server/api/routers/post";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 
