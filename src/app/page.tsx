@@ -18,8 +18,9 @@ export default async function Home() {
               <Pencil1Icon className="h-4 w-4" />
             </Button>
           </div>
-          <div className="flex gap-1 items-center">
+          <div className="flex items-center gap-1">
             <EventsSelect />
+            <Button variant="outline">run all once</Button>
             <SyncButton />
           </div>
         </div>

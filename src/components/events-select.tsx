@@ -40,7 +40,6 @@ export function EventsSelect(props: EventsSelectProps) {
 
   const onHandleSubmit = (values: z.infer<typeof formSchema>) => {
     const events = values.events;
-
     setSelectedEvents(events);
   };
 
