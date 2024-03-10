@@ -42,7 +42,7 @@ const CommandInput = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
   <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+    {/* <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" /> */}
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
@@ -110,21 +110,33 @@ const CommandSeparator = React.forwardRef<
 ));
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
 
-const CommandItem = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive.Item
-    ref={ref}
-    className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className,
-    )}
-    {...props}
-  />
-));
+const CommandItem = React.forwardRef<any, any>(
+  ({ className, ...props }, ref) => (
+    <CommandPrimitive.Item
+      ref={ref}
+      className={cn(
+        "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        className,
+      )}
+      {...props}
+    />
+  ),
+);
+// const CommandItem = React.forwardRef<
+//   React.ElementRef<typeof CommandPrimitive.Item>,
+//   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
+// >(({ className, ...props }, ref) => (
+//   <CommandPrimitive.Item
+//     ref={ref}
+//     className={cn(
+//       "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+//       className,
+//     )}
+//     {...props}
+//   />
+// ));
 
-CommandItem.displayName = CommandPrimitive.Item.displayName;
+CommandItem.displayName = "COMMAND-ITEM";
 
 const CommandShortcut = ({
   className,

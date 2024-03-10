@@ -11,24 +11,24 @@ export function SyncButton(props: SyncButtonProps) {
 
   return (
     <>
-      <div className="flex items-center gap-1">
-        <span>status = {status === "idle" ? "idle" : "active"}</span>
+      {/* <div className="flex items-center gap-1"> */}
+      {/* <span>status = {status === "idle" ? "idle" : "active"}</span> */}
 
-        <Button
-          className="py-1"
-          onClick={() => {
-            setStatus((prev) => {
-              if (prev === "idle") {
-                return "pending";
-              }
-              return "idle";
-            });
-          }}
-        >
-          {status === "idle" ? "Start " : "Stop "}
-          sync
-        </Button>
-      </div>
+      <Button
+        className="py-1"
+        onClick={() => {
+          setStatus((prev) => {
+            if (prev === "idle") {
+              return "pending";
+            }
+            return "idle";
+          });
+        }}
+      >
+        {status === "idle" ? "Start " : "Stop "}
+        sync
+      </Button>
+      {/* </div> */}
     </>
   );
 }

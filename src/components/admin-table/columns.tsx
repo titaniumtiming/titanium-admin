@@ -98,6 +98,7 @@ export const columns: ColumnDef<Operation>[] = [
   },
   {
     id: "actions",
+    header: "Sync interval",
     cell: ({ row }) => <Actions row={row} />,
   },
 ];

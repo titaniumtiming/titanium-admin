@@ -1,6 +1,7 @@
 import { AdminTable } from "@/components/admin-table";
 import { EventsSelect } from "@/components/events-select";
 import { SyncButton } from "@/components/sync-button";
+
 import { Button } from "@/components/ui/button";
 import { Pencil1Icon } from "@radix-ui/react-icons";
 
@@ -17,9 +18,9 @@ export default async function Home() {
               <Pencil1Icon className="h-4 w-4" />
             </Button>
           </div>
-          <div>
-            <SyncButton />
+          <div className="flex gap-1 items-center">
             <EventsSelect />
+            <SyncButton />
           </div>
         </div>
         <AdminTable />

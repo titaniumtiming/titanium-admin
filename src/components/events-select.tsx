@@ -23,16 +23,29 @@ const formSchema = z.object({
 
 export interface EventsSelectProps {}
 
+const eventsData = [
+  {
+    label: "Event 1",
+    value: "event-1",
+  },
+  {
+    label: "Event 2",
+    value: "event-2",
+  },
+  {
+    label: "Event 3",
+    value: "event-3",
+  },
+];
+
+const allValues = eventsData.map((event) => event.value);
 export function EventsSelect(props: EventsSelectProps) {
   const {} = props;
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      events: [
-        // "author1",
-        // { value: "author1", label: "Author 1" },
-        // { value: "author2", label: "Author 2" },
-      ],
+      events: allValues,
     },
     mode: "onBlur",
   });
@@ -41,32 +54,10 @@ export function EventsSelect(props: EventsSelectProps) {
     console.log({ values });
   };
 
-  const eventsData = [
-    {
-      value: "author1",
-      label: "Author 1",
-    },
-    {
-      value: "author2",
-      label: "Author 2",
-    },
-    {
-      value: "author3",
-      label: "Author 3",
-    },
-    {
-      value: "author4",
-      label: "Author 4",
-    },
-  ];
-
   return (
     <>
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onHandleSubmit)}
-          className="space-y-4"
-        >
+        <form onSubmit={form.handleSubmit(onHandleSubmit)}>
           <ErrorBoundary
             errorComponent={() => {
               return <div>error</div>;
@@ -76,13 +67,11 @@ export function EventsSelect(props: EventsSelectProps) {
               control={form.control}
               name="events"
               render={({ field }) => (
-                <FormItem className="mb-5">
-                  {/* <FormLabel>Author</FormLabel> */}
+                <FormItem className="w-[190px]">
                   <MultiSelect
                     selected={field.value}
-                    // selected={field.value}
                     options={eventsData}
-                    // selectAll
+                    selectAll
                     {...field}
                   />
                 </FormItem>
