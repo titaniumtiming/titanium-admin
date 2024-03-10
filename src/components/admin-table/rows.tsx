@@ -36,7 +36,7 @@ export const operations = [
   {
     id: "3",
     title: "Primary Cat",
-    status: "pending",
+    status: "success",
     lastUpdated: new Date("2023-06-10T10:20:00"),
     sqlSpeed: 10.2,
     localDbItemsCount: 20,
@@ -45,7 +45,7 @@ export const operations = [
   {
     id: "4",
     title: "Secondary Cat",
-    status: "error",
+    status: "success",
     lastUpdated: new Date("2023-06-10T10:24:00"),
     sqlSpeed: 10.24,
     localDbItemsCount: 0,
@@ -63,7 +63,7 @@ export const operations = [
   {
     id: "6",
     title: "Athlete Results",
-    status: "success",
+    status: "pending",
     lastUpdated: new Date("2023-06-10T12:00:00"),
     sqlSpeed: 12.0,
     localDbItemsCount: 2500,
@@ -72,7 +72,7 @@ export const operations = [
   {
     id: "7",
     title: "Athlete Splits",
-    status: "success",
+    status: "error",
     lastUpdated: new Date("2023-06-10T12:00:00"),
     sqlSpeed: 12.0,
     localDbItemsCount: 10000,

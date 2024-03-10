@@ -1,4 +1,5 @@
 import { operationSchema, type Operation } from "@/components/admin-table/rows";
+import { IntervalSelect } from "@/components/interval-select";
 import { Button } from "@/components/ui/button";
 import { type Row } from "@tanstack/react-table";
 
@@ -12,9 +13,11 @@ export function Actions(props: ActionsProps) {
 
   return (
     <>
-      <Button variant={"secondary"}>Interval</Button>
-      <Button variant={"secondary"}>Run Sync</Button>
-      <Button variant={"secondary"}>Log</Button>
+      <div className="flex gap-1">
+        <IntervalSelect />
+        <Button variant={"secondary"}>Run</Button>
+        <Button variant={"secondary"}>Log</Button>
+      </div>
     </>
   );
 }
