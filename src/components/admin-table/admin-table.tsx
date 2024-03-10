@@ -1,6 +1,6 @@
 import { columns } from "@/components/admin-table/columns";
 import { DataTable } from "@/components/admin-table/data-table";
-import { rows } from "@/components/admin-table/rows";
+import { operations } from "@/components/admin-table/rows";
 
 export interface AdminTableProps {}
 
@@ -9,7 +9,7 @@ export function AdminTable(props: AdminTableProps) {
 
   return (
     <>
-      <DataTable columns={columns} data={rows} />
+      <DataTable columns={columns} data={operations} />
     </>
   );
 }
