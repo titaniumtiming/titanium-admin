@@ -22,19 +22,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
-export const intervalTypeSchema = z.enum(
-  ["default", "slow", "manual"],
-  z.number(),
-);
+export const intervalTypeSchema = z.enum([
+  "default",
+  "slow",
+  "manual",
+  "custom",
+]);
 const FormSchema = z.object({
   interval: intervalTypeSchema,
+  customInterval: z.string().optional(),
 });
 
 export function IntervalSelect() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     mode: "onBlur",
+    defaultValues: {
+      interval: "default",
+    },
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -62,11 +69,22 @@ export function IntervalSelect() {
       value: "manual",
       label: "Manual",
     },
+    {
+      value: "custom",
+      label: "Custom",
+    },
   ];
+
+  const intervalValue = form.watch("interval");
+  const isManual = intervalValue === "manual";
+  const isCustom = intervalValue === "custom";
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-1 gap-1"
+      >
         <FormField
           control={form.control}
           name="interval"
@@ -91,6 +109,31 @@ export function IntervalSelect() {
             </FormItem>
           )}
         />
+        {isManual && (
+          <Button variant={"secondary"} type="button">
+            Run
+          </Button>
+        )}
+        {isCustom && (
+          <FormField
+            control={form.control}
+            name="customInterval"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    placeholder="custom interval"
+                    type="number"
+                    className="w-[70px]"
+                    {...field}
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
       </form>
     </Form>
   );

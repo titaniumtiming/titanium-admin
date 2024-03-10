@@ -15,7 +15,6 @@ export function Actions(props: ActionsProps) {
     <>
       <div className="flex gap-1">
         <IntervalSelect />
-        <Button variant={"secondary"}>Run</Button>
         <Button variant={"secondary"}>Log</Button>
       </div>
     </>
