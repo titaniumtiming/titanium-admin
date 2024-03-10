@@ -12,9 +12,9 @@ export function Actions(props: ActionsProps) {
 
   return (
     <>
-      <Button>Interval</Button>
-      <Button>Run Sync</Button>
-      <Button>Log</Button>
+      <Button variant={"secondary"}>Interval</Button>
+      <Button variant={"secondary"}>Run Sync</Button>
+      <Button variant={"secondary"}>Log</Button>
     </>
   );
 }

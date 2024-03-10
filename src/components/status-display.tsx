@@ -32,10 +32,7 @@ export function StatusDisplay(props: StatusDisplayProps) {
   const statusColor = statusToVariant[status];
 
   return (
-    <Badge
-      variant={statusColor}
-      className="flex items-center space-x-1 px-2 py-1"
-    >
+    <Badge variant={statusColor} className="flex items-center space-x-1 ">
       <StatusIcon className="h-4 w-4" />
       <span className="capitalize">{status}</span>
     </Badge>
