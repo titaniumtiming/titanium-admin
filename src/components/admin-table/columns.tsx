@@ -5,6 +5,8 @@ import { type Status, type Operation } from "@/components/admin-table/rows";
 import { type ColumnDef } from "@tanstack/react-table";
 import { z } from "zod";
 import { StatusDisplay } from "@/components/status-display";
+import { Pencil1Icon } from "@radix-ui/react-icons";
+import { DatabaseHeaderCell } from "@/components/database-header-cell";
 
 export const columns: ColumnDef<Operation>[] = [
   {
@@ -21,27 +23,78 @@ export const columns: ColumnDef<Operation>[] = [
   },
   {
     accessorKey: "title",
-    header: "Title",
+    header: "Operation",
+    cell: ({ row }) => {
+      const title = row.getValue("title") as string;
+      return <div className="min-w-[130px] flex-1 font-semibold">{title}</div>;
+    },
   },
   {
     accessorKey: "localDbItemsCount",
-    header: "Local DB ",
+    // header: "Local DB ",
+    header: ({ column }) => {
+      return (
+        <DatabaseHeaderCell
+          databaseLabel="Local"
+          databaseTableName="the actual name of the local db"
+          onEditDatabaseName={() => {}}
+        />
+      );
+    },
+    cell: ({ row }) => {
+      const localDbItemsCount = row.getValue("localDbItemsCount") as number;
+      const formattedCount = localDbItemsCount.toLocaleString();
+      return (
+        <div className="text-center font-mono text-[16px]">
+          {formattedCount}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "remoteDbItemsCount",
-    header: "Remote DB",
+    header: ({ column }) => {
+      return (
+        <DatabaseHeaderCell
+          databaseLabel="Remote"
+          databaseTableName="the actual name of the remote db"
+          onEditDatabaseName={() => {}}
+        />
+      );
+    },
+    cell: ({ row }) => {
+      const remoteDbItemsCount = row.getValue("remoteDbItemsCount") as number;
+      const formattedCount = remoteDbItemsCount.toLocaleString();
+      return (
+        <div className="text-center font-mono text-[16px]">
+          {formattedCount}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "lastUpdated",
     header: "Last Updated",
     cell: ({ row }) => {
-      const formattedDate = format(row.getValue("lastUpdated"), "Pp");
-      return <div className="">{formattedDate}</div>;
+      // const formattedDate = format(row.getValue("lastUpdated"), "Pp");
+      return (
+        <div className="flex flex-col ">
+          <span>{format(row.getValue("lastUpdated"), "p")}</span>
+          <span className="text-sm text-muted-foreground">
+            {format(row.getValue("lastUpdated"), "P")}
+          </span>
+        </div>
+      );
     },
   },
   {
     accessorKey: "sqlSpeed",
     header: "SQL Speed",
+    cell: ({ row }) => {
+      const sqlSpeed = row.getValue("sqlSpeed") as number;
+      const formattedSpeed = sqlSpeed.toFixed(0);
+      return <div className="">{formattedSpeed}ms</div>;
+    },
   },
   {
     id: "actions",
