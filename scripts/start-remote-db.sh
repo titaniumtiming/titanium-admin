@@ -18,7 +18,7 @@ fi
 
 if [ "$(docker ps -q -f name=$DB_CONTAINER_NAME)" ]; then
   docker start $DB_CONTAINER_NAME
-  echo "Database container started"
+  echo "REMOTE Database container started"
   exit 0
 fi
 
