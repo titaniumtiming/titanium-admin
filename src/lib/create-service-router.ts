@@ -1,6 +1,5 @@
 import { z, infer as zInfer, ZodTypeAny } from "zod";
 
-// import { capitalizeOnlyFirstLetter, resolvePromises } from "@ream/shared-utils";
 
 import { Resolver, Service } from "./service";
 import { createTRPCRouter, publicProcedure } from "@/lib/trpc/trpc";

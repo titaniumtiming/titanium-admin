@@ -6,11 +6,17 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
+import {
+  ServiceContext,
+  createServiceContext,
+} from "@/services/configure-services";
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-export type ApiContext = Awaited<ReturnType<typeof createTRPCContext>>;
+// export type ApiContext = Awaited<ReturnType<typeof createTRPCContext>>;
+
+export type ApiContext = ServiceContext;
 
 /**
  * 1. CONTEXT
@@ -25,10 +31,11 @@ export type ApiContext = Awaited<ReturnType<typeof createTRPCContext>>;
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  return {
-    db: null as any,
-    ...opts,
-  };
+  return createServiceContext();
+  // return {
+  //   db: null as any,
+  //   ...opts,
+  // };
 };
 
 /**

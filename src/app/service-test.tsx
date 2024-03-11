@@ -7,6 +7,7 @@ export function ServiceTest(props: ServiceTestProps) {
   const {} = props;
 
   const { data } = api.syncRaces.useQuery();
+  const { data: data2 } = api.syncEvents.useQuery();
 
   return (
     <>

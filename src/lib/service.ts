@@ -9,17 +9,12 @@ import {
 
 import { Simplify } from "@/lib/utils";
 import { ApiContext } from "@/lib/trpc/trpc";
+import { ServiceContext } from "@/services/configure-services";
 /**
  * "Access" related code has been commented out.
  * This handles authenticated vs public access.
  * Chose to not delete it in case it's needed later.
  */
-
-// ! careful changing , used in create-router-from-services.ts)
-
-export type ServiceContext = {
-  db: any;
-};
 
 // Generic type for resolver functions
 export type Resolver<
