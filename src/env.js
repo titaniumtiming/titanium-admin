@@ -7,12 +7,19 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    DATABASE_URL: z
+    REMOTE_DATABASE_URL: z
       .string()
       .url()
       .refine(
         (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
-        "You forgot to change the default URL"
+        "You forgot to change the default URL",
+      ),
+    LOCAL_DATABASE_URL: z
+      .string()
+      .url()
+      .refine(
+        (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
+        "You forgot to change the default URL",
       ),
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -33,7 +40,8 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    DATABASE_URL: process.env.DATABASE_URL,
+    REMOTE_DATABASE_URL: process.env.REMOTE_DATABASE_URL,
+    LOCAL_DATABASE_URL: process.env.LOCAL_DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
