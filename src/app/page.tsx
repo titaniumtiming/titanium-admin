@@ -1,3 +1,4 @@
+import { ServiceTest } from "@/app/service-test";
 import { AdminTable } from "@/components/admin-table";
 import { EventsSelect } from "@/components/events-select";
 import { SyncButton } from "@/components/sync-button";
@@ -19,6 +20,7 @@ export default async function Home() {
             </Button>
           </div>
           <div className="flex items-center gap-1">
+            <ServiceTest />
             <EventsSelect />
             <Button variant="outline">run all once</Button>
             <SyncButton />
