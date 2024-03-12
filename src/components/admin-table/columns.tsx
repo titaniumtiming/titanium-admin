@@ -1,17 +1,11 @@
 "use client";
-import { format } from "date-fns";
 import { Actions } from "@/components/admin-table/actions";
-import {
-  type Status,
-  type Operation,
-  SyncDbTableName,
-} from "@/components/admin-table/rows";
-import { CellContext, type ColumnDef } from "@tanstack/react-table";
-import { z } from "zod";
-import { StatusDisplay } from "@/components/status-display";
-import { Pencil1Icon } from "@radix-ui/react-icons";
+import { format } from "date-fns";
+
 import { DatabaseHeaderCell } from "@/components/database-header-cell";
+import { Operation, SyncDbTableName } from "@/schemas";
 import { useLastSyncedAt } from "@/store";
+import { type ColumnDef } from "@tanstack/react-table";
 
 export const columns: ColumnDef<Operation>[] = [
   // {

@@ -1,6 +1,6 @@
-import { type Status } from "@/components/admin-table/rows";
 import { Badge, BadgeProps } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Status } from "@/schemas";
 import {
   CheckCircledIcon,
   CircleIcon,

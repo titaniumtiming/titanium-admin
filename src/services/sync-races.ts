@@ -151,5 +151,3 @@ export const syncRaces = service().mutation(async ({ ctx }) => {
   //   return log;
   return pushResult;
 });
-
-export default syncRaces;

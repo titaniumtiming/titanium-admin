@@ -1,13 +1,12 @@
-import { SyncDbTableName } from "@/components/admin-table/rows";
-
+import { SyncDbTableName } from "@/schemas";
 const seconds = 1000;
 
 export const syncDbTableNameToInterval = {
-  "Athlete Results": {
+  AthleteResults: {
     default: 15 * seconds,
     slow: 30 * seconds,
   },
-  "Athlete Splits": {
+  AthleteSplits: {
     default: 20 * seconds,
     slow: 40 * seconds,
   },
@@ -19,11 +18,11 @@ export const syncDbTableNameToInterval = {
     default: 40 * seconds,
     slow: 50 * seconds,
   },
-  "Primary Cat": {
+  PrimaryCat: {
     default: 15 * seconds,
     slow: 30 * seconds,
   },
-  "Secondary Cat": {
+  SecondaryCat: {
     default: 15 * seconds,
     slow: 30 * seconds,
   },

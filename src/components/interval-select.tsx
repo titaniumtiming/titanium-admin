@@ -30,7 +30,7 @@ import {
   SetSyncInterval,
   useDefaultSyncInterval,
   useSyncIntervalOptions,
-} from "@/lib/use-sync-operation-interval";
+} from "@/lib/use-run-sync-operation-at-interval";
 
 const FormSchema = z.object({
   interval: z.string(),

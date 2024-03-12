@@ -1,7 +1,6 @@
-import { SyncDbTableName } from "@/components/admin-table/rows";
-
 import { syncDbTableNameToInterval } from "@/config";
 import { useInterval } from "@/lib/use-interval";
+import { SyncDbTableName } from "@/schemas";
 import { useGlobalStore } from "@/store";
 import { useMemo, useState } from "react";
 
@@ -11,7 +10,9 @@ export type UseSyncOperationIntervalProps = {
 };
 
 export type SetSyncInterval = (interval: number | null) => void;
-export function useSyncOperationInterval(props: UseSyncOperationIntervalProps) {
+export function useRunSyncOperationAtInterval(
+  props: UseSyncOperationIntervalProps,
+) {
   const { runSyncOperation, dbTableName } = props;
   const defaultSyncInterval = useDefaultSyncInterval(dbTableName);
   const [syncInterval, setSyncInterval] = useState<number | null>(

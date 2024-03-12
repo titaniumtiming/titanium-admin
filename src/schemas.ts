@@ -25,3 +25,30 @@ export const RaceTableSchema = z.object({
 });
 
 export type RaceTableData = z.infer<typeof RaceTableSchema>;
+export const statusSchema = z.enum(["idle", "pending", "success", "error"]);
+
+export type Status = z.infer<typeof statusSchema>;
+
+export const syncDbTableNameSchema = z.enum([
+  "Races",
+  "Events",
+  "Splits",
+  "PrimaryCat",
+  "SecondaryCat",
+  "Athletes",
+  "AthleteResults",
+  "AthleteSplits",
+]);
+
+export type SyncDbTableName = z.infer<typeof syncDbTableNameSchema>;
+
+export const syncTableOperationSchema = z.object({
+  id: z.string(),
+  dbTableName: syncDbTableNameSchema,
+  status: statusSchema,
+  lastUpdated: z.date(),
+  sqlSpeed: z.number(),
+  localDbItemsCount: z.number(),
+  remoteDbItemsCount: z.number(),
+});
+export type Operation = z.infer<typeof syncTableOperationSchema>;

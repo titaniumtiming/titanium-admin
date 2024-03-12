@@ -5,5 +5,3 @@ export const syncEvents = service().mutation(async ({ ctx }) => {
   return result as any;
   return "hello" as const;
 });
-
-export default syncEvents;

@@ -1,19 +1,12 @@
 "use client";
-import {
-  syncTableOperationSchema,
-  operationToApi,
-  type Operation,
-} from "@/components/admin-table/rows";
+
 import { IntervalSelect } from "@/components/interval-select";
 import { StatusDisplay } from "@/components/status-display";
 import { Button } from "@/components/ui/button";
-import { api } from "@/lib/trpc/react";
-import { useInterval } from "@/lib/use-interval";
-import { useSyncOperationInterval } from "@/lib/use-sync-operation-interval";
-import { setLastSyncedAt } from "@/store";
+import { useRunSyncOperation } from "@/lib/use-run-sync-operation";
+import { useRunSyncOperationAtInterval } from "@/lib/use-run-sync-operation-at-interval";
+import { Operation, syncTableOperationSchema } from "@/schemas";
 import { type Row } from "@tanstack/react-table";
-import { format } from "date-fns";
-import { useMemo, useState } from "react";
 
 export interface ActionsProps {
   row: Row<Operation>;
@@ -22,58 +15,14 @@ export interface ActionsProps {
 export function Actions(props: ActionsProps) {
   const { row } = props;
 
-  const [log, setLog] = useState<string[]>([]);
-
-  const [startedAt, setStartedAt] = useState<Date | null>(null);
-  const [endedAt, setEndedAt] = useState<Date | null>(null);
-
-  const lastRunDuration = useMemo(() => {
-    if (!endedAt || !startedAt) return null;
-
-    return endedAt.getTime() - startedAt.getTime();
-  }, [endedAt, startedAt]);
-
   const operation = syncTableOperationSchema.parse(row.original);
 
-  const operationApi = operationToApi(operation.dbTableName);
+  const { runSyncOperation, status, lastRunDuration, log } =
+    useRunSyncOperation({
+      operation,
+    });
 
-  const { mutateAsync, status } = operationApi({});
-
-  // time how long it takes to run the operation
-  //  save when it was last run
-  //  save the return time of the operation in a log
-  const runSyncOperation = async () => {
-    if (!row) return;
-    if (!row.original) return;
-
-    if (!row.original.dbTableName) return "no dbTableName";
-    const startedAt = new Date();
-    setStartedAt(startedAt);
-    try {
-      const result = await mutateAsync();
-      const endedAt = new Date();
-      setEndedAt(endedAt);
-      setLastSyncedAt(operation.dbTableName, endedAt);
-      setLog((prev) => [
-        JSON.stringify(result, null, 2),
-        ...prev,
-
-        // `Ran operation at ${startedAt.toISOString()} and finished at ${endedAt.toISOString()}`,
-      ]);
-      return result;
-    } catch (error) {
-      const endedAt = new Date();
-      setEndedAt(endedAt);
-      setLastSyncedAt(operation.dbTableName, endedAt);
-      setLog((prev) => [
-        ...prev,
-        `Ran operation at ${startedAt.toISOString()} and finished at ${endedAt.toISOString()} with error: ${(error as any)?.message ?? error ?? "unknown"}`,
-      ]);
-      throw error;
-    }
-  };
-
-  const { setSyncInterval, syncInterval } = useSyncOperationInterval({
+  const { setSyncInterval, syncInterval } = useRunSyncOperationAtInterval({
     dbTableName: operation.dbTableName,
     runSyncOperation,
   });
