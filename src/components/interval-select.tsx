@@ -38,13 +38,11 @@ const FormSchema = z.object({
 });
 
 export type IntervalSelectProps = {
-  operation: Operation;
+  onRun: () => Promise<unknown>;
 };
 
 export function IntervalSelect(props: IntervalSelectProps) {
-  const { operation } = props;
-
-  
+  const { onRun } = props;
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -56,14 +54,6 @@ export function IntervalSelect(props: IntervalSelectProps) {
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     alert(JSON.stringify(data, null, 2));
-    // toast({
-    //   title: "You submitted the following values:",
-    //   description: (
-    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-    //     </pre>
-    //   ),
-    // });
   }
 
   const options = [
@@ -124,7 +114,8 @@ export function IntervalSelect(props: IntervalSelectProps) {
             variant={"secondary"}
             type="button"
             onClick={() => {
-              console.log("run sync query", operation.title);
+              onRun();
+              // console.log("run sync query", operation.dbTableName);
             }}
           >
             Run

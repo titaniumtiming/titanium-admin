@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import type {} from "@redux-devtools/extension"; // required for devtools typing
+import { SyncDbTableName } from "@/components/admin-table/rows";
 
 interface GlobalStore {
   syncEnabled: boolean;
@@ -8,6 +9,7 @@ interface GlobalStore {
   disableSync: () => void;
   selectedEvents: string[];
   setSelectedEvents: (events: string[]) => void;
+  syncTableDbNameToLastSyncedAt: Partial<Record<SyncDbTableName, Date>>;
 }
 
 export const eventsData = [
@@ -35,6 +37,7 @@ export const useGlobalStore = create<GlobalStore>()(
         selectedEvents: [],
         setSelectedEvents: (events: string[]) =>
           set({ selectedEvents: events }),
+        syncTableDbNameToLastSyncedAt: {},
       }),
       {
         name: "global-store",
@@ -42,6 +45,28 @@ export const useGlobalStore = create<GlobalStore>()(
     ),
   ),
 );
+
+export function useLastSyncedAt(dbTableName: SyncDbTableName) {
+  const lastSyncedAt = useGlobalStore(
+    (state) => state.syncTableDbNameToLastSyncedAt[dbTableName],
+  );
+  return lastSyncedAt;
+}
+
+export function setLastSyncedAt(
+  dbTableName: SyncDbTableName,
+  newDate = new Date(),
+) {
+  return useGlobalStore.setState((prev) => {
+    return {
+      ...prev,
+      syncTableDbNameToLastSyncedAt: {
+        ...prev.syncTableDbNameToLastSyncedAt,
+        [dbTableName]: newDate,
+      },
+    };
+  });
+}
 
 /**
  * REFETCHING LOGIC:

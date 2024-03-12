@@ -2,7 +2,7 @@ import { service } from "@/lib/service";
 import { RaceTableData, RaceTableSchema } from "@/schemas";
 import { z } from "zod";
 
-export const syncRacesPullFromRacetec = service()
+const syncRacesPullFromRacetec = service()
   .output(RaceTableSchema)
   .query(async ({ ctx }) => {
     const result = await ctx.localDb.request().query(`
@@ -63,7 +63,7 @@ export const syncRacesPullFromRacetec = service()
     return result.recordset[0] as unknown as RaceTableData;
   });
 
-export const syncRacesPushToDigitalOcean = service()
+const syncRacesPushToDigitalOcean = service()
   .input(RaceTableSchema)
   .mutation(async ({ ctx, input }) => {
     const result = await ctx.remoteDb.execute(
@@ -151,3 +151,5 @@ export const syncRaces = service().mutation(async ({ ctx }) => {
   //   return log;
   return pushResult;
 });
+
+export default syncRaces;

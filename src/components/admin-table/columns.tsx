@@ -1,32 +1,39 @@
 "use client";
 import { format } from "date-fns";
 import { Actions } from "@/components/admin-table/actions";
-import { type Status, type Operation } from "@/components/admin-table/rows";
-import { type ColumnDef } from "@tanstack/react-table";
+import {
+  type Status,
+  type Operation,
+  SyncDbTableName,
+} from "@/components/admin-table/rows";
+import { CellContext, type ColumnDef } from "@tanstack/react-table";
 import { z } from "zod";
 import { StatusDisplay } from "@/components/status-display";
 import { Pencil1Icon } from "@radix-ui/react-icons";
 import { DatabaseHeaderCell } from "@/components/database-header-cell";
+import { useLastSyncedAt } from "@/store";
 
 export const columns: ColumnDef<Operation>[] = [
+  // {
+  //   accessorKey: "status",
+  //   header: "Status",
+  //   cell: ({ row }) => {
+  //     const status = row.getValue("status") as Status;
+  //     return (
+  //       <div className="flex w-[100px] items-center">
+  //         <StatusDisplay status={status} />
+  //       </div>
+  //     );
+  //   },
+  // },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "dbTableName",
+    header: "Table Name",
     cell: ({ row }) => {
-      const status = row.getValue("status") as Status;
+      const dbTableName = row.getValue("dbTableName") as string;
       return (
-        <div className="flex w-[100px] items-center">
-          <StatusDisplay status={status} />
-        </div>
+        <div className="min-w-[130px] flex-1 font-semibold">{dbTableName}</div>
       );
-    },
-  },
-  {
-    accessorKey: "title",
-    header: "Operation",
-    cell: ({ row }) => {
-      const title = row.getValue("title") as string;
-      return <div className="min-w-[130px] flex-1 font-semibold">{title}</div>;
     },
   },
   {
@@ -74,34 +81,40 @@ export const columns: ColumnDef<Operation>[] = [
   },
   {
     accessorKey: "lastUpdated",
-    header: "Last Updated",
+    header: "Last Synced At",
     cell: ({ row }) => {
-      // const formattedDate = format(row.getValue("lastUpdated"), "Pp");
-      return (
-        <div className="flex flex-col ">
-          <span>{format(row.getValue("lastUpdated"), "p")}</span>
-          <span className="text-sm text-muted-foreground">
-            {format(row.getValue("lastUpdated"), "P")}
-          </span>
-        </div>
-      );
+      const dbTableName = row.getValue("dbTableName") as SyncDbTableName;
+      return <LastSyncedAtCell dbTableName={dbTableName} />;
     },
   },
-  {
-    accessorKey: "sqlSpeed",
-    header: "SQL Speed",
-    cell: ({ row }) => {
-      const sqlSpeed = row.getValue("sqlSpeed") as number;
-      const formattedSpeed = sqlSpeed.toFixed(0);
-      return <div className="">{formattedSpeed}ms</div>;
-    },
-  },
+  // {
+  //   accessorKey: "sqlSpeed",
+  //   header: "SQL Speed",
+  //   cell: ({ row }) => {
+  //     const sqlSpeed = row.getValue("sqlSpeed") as number;
+  //     const formattedSpeed = sqlSpeed.toFixed(0);
+  //     return <div className="">{formattedSpeed}ms</div>;
+  //   },
+  // },
   {
     id: "actions",
     header: "Sync interval",
     cell: ({ row }) => <Actions row={row} />,
   },
 ];
+
+function LastSyncedAtCell({ dbTableName }: { dbTableName: SyncDbTableName }) {
+  const lastSyncedAt = useLastSyncedAt(dbTableName);
+  if (!lastSyncedAt) return null;
+  return (
+    <div className="flex flex-col ">
+      <span>{format(lastSyncedAt, "p")}</span>
+      <span className="text-sm text-muted-foreground">
+        {format(lastSyncedAt, "P")}
+      </span>
+    </div>
+  );
+}
 
 /**
  * - status

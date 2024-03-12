@@ -24,6 +24,7 @@ const statusToVariant = {
 export interface StatusDisplayProps {
   status: Status;
   statusReason?: string;
+  children?: React.ReactNode;
 }
 
 export function StatusDisplay(props: StatusDisplayProps) {
@@ -35,6 +36,7 @@ export function StatusDisplay(props: StatusDisplayProps) {
     <Badge variant={statusColor} className="flex items-center space-x-1 ">
       <StatusIcon className="h-4 w-4" />
       <span className="capitalize">{status}</span>
+      {props.children}
     </Badge>
   );
 }

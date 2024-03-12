@@ -4,7 +4,7 @@ export const statusSchema = z.enum(["idle", "pending", "success", "error"]);
 
 export type Status = z.infer<typeof statusSchema>;
 
-const operationTitleSchema = z.enum([
+const syncDbTableNameSchema = z.enum([
   "Races",
   "Events",
   "Splits",
@@ -15,11 +15,11 @@ const operationTitleSchema = z.enum([
   "Athlete Splits",
 ]);
 
-export type OperationTitle = z.infer<typeof operationTitleSchema>;
+export type SyncDbTableName = z.infer<typeof syncDbTableNameSchema>;
 
-export const operationSchema = z.object({
+export const syncTableOperationSchema = z.object({
   id: z.string(),
-  title: operationTitleSchema,
+  dbTableName: syncDbTableNameSchema,
   status: statusSchema,
   lastUpdated: z.date(),
   sqlSpeed: z.number(),
@@ -28,33 +28,33 @@ export const operationSchema = z.object({
 });
 
 export const operationToApi = (
-  operationTitle: OperationTitle,
-): typeof api.syncRaces.useQuery => {
+  dbTable: SyncDbTableName,
+): typeof api.syncRaces.useMutation => {
   /**
    * current only upload races & events
    * rest are implemented with racetec
    */
-  if (operationTitle === "Races") return api.syncRaces.useQuery;
-  if (operationTitle === "Events") return api.syncEvents.useQuery;
-  if (operationTitle === "Splits") return api.syncRaces.useQuery;
-  if (operationTitle === "Primary Cat") return api.syncRaces.useQuery;
-  if (operationTitle === "Secondary Cat") return api.syncRaces.useQuery;
-  if (operationTitle === "Athletes") return api.syncRaces.useQuery;
+  if (dbTable === "Races") return api.syncRaces.useMutation;
+  if (dbTable === "Events") return api.syncEvents.useMutation;
+  if (dbTable === "Splits") return api.syncRaces.useMutation;
+  if (dbTable === "Primary Cat") return api.syncRaces.useMutation;
+  if (dbTable === "Secondary Cat") return api.syncRaces.useMutation;
+  if (dbTable === "Athletes") return api.syncRaces.useMutation;
   /**
    * start with athlete results first (WORST ONE)
    */
-  if (operationTitle === "Athlete Results") return api.syncRaces.useQuery;
-  if (operationTitle === "Athlete Splits") return api.syncRaces.useQuery;
+  if (dbTable === "Athlete Results") return api.syncRaces.useMutation;
+  if (dbTable === "Athlete Splits") return api.syncRaces.useMutation;
 
-  throw new Error(`Unknown operation title: ${operationTitle}`);
+  throw new Error(`Unknown operation dbTable: ${dbTable}`);
 };
 
-export type Operation = z.infer<typeof operationSchema>;
+export type Operation = z.infer<typeof syncTableOperationSchema>;
 
 export const operations = [
   {
     id: "1",
-    title: "Races",
+    dbTableName: "Races",
     status: "success",
     lastUpdated: new Date("2023-06-10T09:51:00"),
     sqlSpeed: 69.51,
@@ -63,7 +63,7 @@ export const operations = [
   },
   {
     id: "2",
-    title: "Events",
+    dbTableName: "Events",
     status: "success",
     lastUpdated: new Date("2023-06-10T09:51:00"),
     sqlSpeed: 69.51,
@@ -72,7 +72,7 @@ export const operations = [
   },
   {
     id: "3",
-    title: "Primary Cat",
+    dbTableName: "Primary Cat",
     status: "success",
     lastUpdated: new Date("2023-06-10T10:20:00"),
     sqlSpeed: 10.2,
@@ -81,7 +81,7 @@ export const operations = [
   },
   {
     id: "4",
-    title: "Secondary Cat",
+    dbTableName: "Secondary Cat",
     status: "success",
     lastUpdated: new Date("2023-06-10T10:24:00"),
     sqlSpeed: 10.24,
@@ -90,7 +90,7 @@ export const operations = [
   },
   {
     id: "5",
-    title: "Athletes",
+    dbTableName: "Athletes",
     status: "idle",
     lastUpdated: new Date("2023-06-10T11:04:00"),
     sqlSpeed: 11.04,
@@ -99,7 +99,7 @@ export const operations = [
   },
   {
     id: "6",
-    title: "Athlete Results",
+    dbTableName: "Athlete Results",
     status: "pending",
     lastUpdated: new Date("2023-06-10T12:00:00"),
     sqlSpeed: 12.0,
@@ -108,7 +108,7 @@ export const operations = [
   },
   {
     id: "7",
-    title: "Athlete Splits",
+    dbTableName: "Athlete Splits",
     status: "error",
     lastUpdated: new Date("2023-06-10T12:00:00"),
     sqlSpeed: 12.0,

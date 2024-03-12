@@ -20,7 +20,7 @@ export default async function Home() {
             </Button>
           </div>
           <div className="flex items-center gap-1">
-            <ServiceTest />
+            {/* <ServiceTest /> */}
             <EventsSelect />
             <Button variant="outline">run all once</Button>
             <SyncButton />
