@@ -28,25 +28,25 @@ export const syncTableOperationSchema = z.object({
 });
 
 export const operationToApi = (
-  dbTable: SyncDbTableName,
+  dbTableName: SyncDbTableName,
 ): typeof api.syncRaces.useMutation => {
   /**
    * current only upload races & events
    * rest are implemented with racetec
    */
-  if (dbTable === "Races") return api.syncRaces.useMutation;
-  if (dbTable === "Events") return api.syncEvents.useMutation;
-  if (dbTable === "Splits") return api.syncRaces.useMutation;
-  if (dbTable === "Primary Cat") return api.syncRaces.useMutation;
-  if (dbTable === "Secondary Cat") return api.syncRaces.useMutation;
-  if (dbTable === "Athletes") return api.syncRaces.useMutation;
+  if (dbTableName === "Races") return api.syncRaces.useMutation;
+  if (dbTableName === "Events") return api.syncEvents.useMutation;
+  if (dbTableName === "Splits") return api.syncRaces.useMutation;
+  if (dbTableName === "Primary Cat") return api.syncRaces.useMutation;
+  if (dbTableName === "Secondary Cat") return api.syncRaces.useMutation;
+  if (dbTableName === "Athletes") return api.syncRaces.useMutation;
   /**
    * start with athlete results first (WORST ONE)
    */
-  if (dbTable === "Athlete Results") return api.syncRaces.useMutation;
-  if (dbTable === "Athlete Splits") return api.syncRaces.useMutation;
+  if (dbTableName === "Athlete Results") return api.syncRaces.useMutation;
+  if (dbTableName === "Athlete Splits") return api.syncRaces.useMutation;
 
-  throw new Error(`Unknown operation dbTable: ${dbTable}`);
+  throw new Error(`Unknown operation dbTableName: ${dbTableName}`);
 };
 
 export type Operation = z.infer<typeof syncTableOperationSchema>;

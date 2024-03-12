@@ -4,10 +4,16 @@ import {
   operationToApi,
   type Operation,
 } from "@/components/admin-table/rows";
-import { IntervalSelect } from "@/components/interval-select";
+import {
+  IntervalConfig,
+  IntervalSelect,
+  defaultIntervalConfig,
+} from "@/components/interval-select";
 import { StatusDisplay } from "@/components/status-display";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/trpc/react";
+import { useInterval } from "@/lib/use-interval";
+import { useSyncOperationInterval } from "@/lib/use-sync-operation-interval";
 import { setLastSyncedAt } from "@/store";
 import { type Row } from "@tanstack/react-table";
 import { format } from "date-fns";
@@ -19,9 +25,8 @@ export interface ActionsProps {
 
 export function Actions(props: ActionsProps) {
   const { row } = props;
-  const [log, setLog] = useState<string[]>([]);
 
-  // const {}useGlobalStore
+  const [log, setLog] = useState<string[]>([]);
 
   const [startedAt, setStartedAt] = useState<Date | null>(null);
   const [endedAt, setEndedAt] = useState<Date | null>(null);
@@ -32,18 +37,9 @@ export function Actions(props: ActionsProps) {
     return endedAt.getTime() - startedAt.getTime();
   }, [endedAt, startedAt]);
 
-  if (!row) return;
-  if (!row.original) return;
-
-  if (!row.original.dbTableName) return "no dbTableName";
-
   const operation = syncTableOperationSchema.parse(row.original);
 
   const operationApi = operationToApi(operation.dbTableName);
-
-  if (!operationApi) {
-    throw new Error(`Unknown operation dbTableName: ${operation.dbTableName}`);
-  }
 
   const { mutateAsync, status } = operationApi({});
 
@@ -51,6 +47,10 @@ export function Actions(props: ActionsProps) {
   //  save when it was last run
   //  save the return time of the operation in a log
   const runSyncOperation = async () => {
+    if (!row) return;
+    if (!row.original) return;
+
+    if (!row.original.dbTableName) return "no dbTableName";
     const startedAt = new Date();
     setStartedAt(startedAt);
     try {
@@ -77,10 +77,18 @@ export function Actions(props: ActionsProps) {
     }
   };
 
+  const { setIntervalConfig } = useSyncOperationInterval({
+    dbTableName: operation.dbTableName,
+    runSyncOperation,
+  });
+
   return (
     <>
       <div className="flex items-center gap-1">
-        <IntervalSelect onRun={runSyncOperation} />
+        <IntervalSelect
+          onRun={runSyncOperation}
+          setIntervalConfig={setIntervalConfig}
+        />
         <div className="flex flex-col">
           <div className="flex items-center gap-1">
             <StatusDisplay status={status}>

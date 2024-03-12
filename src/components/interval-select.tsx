@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Operation } from "@/components/admin-table/rows";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 export const intervalTypeSchema = z.enum([
   "default",
@@ -37,23 +38,28 @@ const FormSchema = z.object({
   customInterval: z.string().optional(),
 });
 
+export type IntervalConfig = z.infer<typeof FormSchema>;
+export const defaultIntervalConfig: IntervalConfig = {
+  interval: "manual",
+};
+
 export type IntervalSelectProps = {
   onRun: () => Promise<unknown>;
+  setIntervalConfig: (intervalConfig: IntervalConfig) => void;
 };
 
 export function IntervalSelect(props: IntervalSelectProps) {
-  const { onRun } = props;
+  const { onRun, setIntervalConfig } = props;
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    mode: "onBlur",
-    defaultValues: {
-      interval: "manual",
-    },
+    mode: "onChange",
+    defaultValues: defaultIntervalConfig,
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    alert(JSON.stringify(data, null, 2));
+    // console.log("SUBMITTING: data", data);
+    setIntervalConfig(data);
   }
 
   const options = [
@@ -76,8 +82,16 @@ export function IntervalSelect(props: IntervalSelectProps) {
   ];
 
   const intervalValue = form.watch("interval");
+  const customIntervalValue = form.watch("customInterval");
   const isManual = intervalValue === "manual";
   const isCustom = intervalValue === "custom";
+
+  useEffect(() => {
+    setIntervalConfig({
+      interval: intervalValue,
+      customInterval: customIntervalValue,
+    });
+  }, [intervalValue, customIntervalValue]);
 
   return (
     <Form {...form}>
@@ -89,7 +103,12 @@ export function IntervalSelect(props: IntervalSelectProps) {
           control={form.control}
           name="interval"
           render={({ field }) => (
-            <FormItem className="w-[105px]">
+            <FormItem
+              className="w-[105px]"
+              onClick={() => {
+                console.log("form data: ", form.getValues());
+              }}
+            >
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
