@@ -24,6 +24,11 @@ if [ "$(docker ps -q -f name=$DB_CONTAINER_NAME)" ]; then
   exit 0
 fi
 
+# instead of creating new, for now just exit early. This is to avoid the need to restore the database incase the env variables are wrong. If using db for the first time then comment out the next two lines:
+echo "Could not find a local MSSQL database container. Please check your .env file and try again."
+exit 0
+
+
 # import env variables from .env
 set -a
 source .env
@@ -35,6 +40,10 @@ if [ "${#DB_PASSWORD}" -lt 8 ]; then
   DB_PASSWORD=$(openssl rand -base64 12)
   echo "A random password has been generated for the MSSQL SA user."
 fi
+
+
+
+
 
 # Update the .env file with the new SA password
 sed -i -e "s#LOCAL_DATABASE_URL=.*@#LOCAL_DATABASE_URL=$DB_PASSWORD@#" .env

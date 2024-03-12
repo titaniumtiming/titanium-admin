@@ -22,6 +22,10 @@ if [ "$(docker ps -q -f name=$DB_CONTAINER_NAME)" ]; then
   exit 0
 fi
 
+# instead of creating new, for now just exit early. This is to avoid the need to restore the database incase the env variables are wrong. If using db for the first time then comment out the next two lines:
+echo "Could not find a REMOTE MYSQL database container. Please check your .env file and try again."
+exit 0
+
 # import env variables from .env
 set -a
 source .env
