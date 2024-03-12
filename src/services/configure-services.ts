@@ -34,7 +34,11 @@ export const createServiceContext = async (): Promise<ServiceContext> => {
   });
 
   await localDb.connect();
-  const remoteDb = createPool(env.REMOTE_DATABASE_URL);
+  const remoteDb = createPool({
+    uri: env.REMOTE_DATABASE_URL,
+    namedPlaceholders: true,
+  });
+
   return {
     localDb,
     remoteDb,

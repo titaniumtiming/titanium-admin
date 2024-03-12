@@ -23,6 +23,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Operation } from "@/components/admin-table/rows";
+import { toast } from "sonner";
 
 export const intervalTypeSchema = z.enum([
   "default",
@@ -35,12 +37,20 @@ const FormSchema = z.object({
   customInterval: z.string().optional(),
 });
 
-export function IntervalSelect() {
+export type IntervalSelectProps = {
+  operation: Operation;
+};
+
+export function IntervalSelect(props: IntervalSelectProps) {
+  const { operation } = props;
+
+  
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     mode: "onBlur",
     defaultValues: {
-      interval: "default",
+      interval: "manual",
     },
   });
 
@@ -110,7 +120,13 @@ export function IntervalSelect() {
           )}
         />
         {isManual && (
-          <Button variant={"secondary"} type="button">
+          <Button
+            variant={"secondary"}
+            type="button"
+            onClick={() => {
+              console.log("run sync query", operation.title);
+            }}
+          >
             Run
           </Button>
         )}

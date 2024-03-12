@@ -1,16 +1,53 @@
+import { api } from "@/lib/trpc/react";
 import { z } from "zod";
 export const statusSchema = z.enum(["idle", "pending", "success", "error"]);
 
 export type Status = z.infer<typeof statusSchema>;
+
+const operationTitleSchema = z.enum([
+  "Races",
+  "Events",
+  "Splits",
+  "Primary Cat",
+  "Secondary Cat",
+  "Athletes",
+  "Athlete Results",
+  "Athlete Splits",
+]);
+
+export type OperationTitle = z.infer<typeof operationTitleSchema>;
+
 export const operationSchema = z.object({
   id: z.string(),
-  title: z.string(),
+  title: operationTitleSchema,
   status: statusSchema,
   lastUpdated: z.date(),
   sqlSpeed: z.number(),
   localDbItemsCount: z.number(),
   remoteDbItemsCount: z.number(),
 });
+
+export const operationToApi = (
+  operationTitle: OperationTitle,
+): typeof api.syncRaces.useQuery => {
+  /**
+   * current only upload races & events
+   * rest are implemented with racetec
+   */
+  if (operationTitle === "Races") return api.syncRaces.useQuery;
+  if (operationTitle === "Events") return api.syncEvents.useQuery;
+  if (operationTitle === "Splits") return api.syncRaces.useQuery;
+  if (operationTitle === "Primary Cat") return api.syncRaces.useQuery;
+  if (operationTitle === "Secondary Cat") return api.syncRaces.useQuery;
+  if (operationTitle === "Athletes") return api.syncRaces.useQuery;
+  /**
+   * start with athlete results first (WORST ONE)
+   */
+  if (operationTitle === "Athlete Results") return api.syncRaces.useQuery;
+  if (operationTitle === "Athlete Splits") return api.syncRaces.useQuery;
+
+  throw new Error(`Unknown operation title: ${operationTitle}`);
+};
 
 export type Operation = z.infer<typeof operationSchema>;
 
