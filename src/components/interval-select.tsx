@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Operation, SyncDbTableName } from "@/components/admin-table/rows";
+
 import { toast } from "sonner";
 import { useEffect } from "react";
 import {
@@ -31,6 +31,7 @@ import {
   useDefaultSyncInterval,
   useSyncIntervalOptions,
 } from "@/lib/use-run-sync-operation-at-interval";
+import { SyncDbTableName } from "@/schemas";
 
 const FormSchema = z.object({
   interval: z.string(),
@@ -53,7 +54,9 @@ export function IntervalSelect(props: IntervalSelectProps) {
     resolver: zodResolver(FormSchema),
     mode: "onChange",
     defaultValues: {
-      interval: "manual",
+      interval: syncIntervalOptions.find(
+        (option) => option.value === defaultValue.toString(),
+      )?.value as string,
       customInterval: (defaultValue / 1000).toString(),
     },
   });

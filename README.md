@@ -1,6 +1,7 @@
 [x]: running = sync green
 
 iteration 1:
+[x]: change default sync interval
 []: too many connections error (use singleton)
 []: all sync queries implemented
 []: change race id (modal)

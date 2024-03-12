@@ -1,5 +1,6 @@
 "use client";
-import { operationToApi, type Operation } from "@/components/admin-table/rows";
+import { operationToApi } from "@/components/admin-table/rows";
+import { Operation } from "@/schemas";
 import { setLastSyncedAt } from "@/store";
 import { useMemo, useState } from "react";
 
