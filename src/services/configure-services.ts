@@ -1,51 +1,51 @@
 import { env } from "@/env";
-import { Pool } from "mysql2";
-import { createPool } from "mysql2/promise";
 import mssql from "mssql";
+import { createPool } from "mysql2/promise";
+
+// Define a type for the service context to ensure type safety.
 export type ServiceContext = {
   localDb: mssql.ConnectionPool;
   remoteDb: ReturnType<typeof createPool>;
 };
 
+// Declare variables to hold the singleton instances.
+let localDbInstance: mssql.ConnectionPool | null = null;
+let remoteDbInstance: ReturnType<typeof createPool> | null = null;
+
 /**
- * TODO: use a signleton pattern to create the service context and return it, otherwise too many connections will be created and the app will crash
- * @returns
+ * Creates or returns an existing instance of the service context.
+ * Ensures that only one instance of the localDb and remoteDb connections exist.
+ * @returns A promise that resolves to an instance of the ServiceContext.
  */
-
 export const createServiceContext = async (): Promise<ServiceContext> => {
-  // // const localDb = createPool(env.LOCAL_DATABASE_URL);
-  // const localDb = createPool({
-  //   host: env.LOCAL_DB_HOST,
-  //   password: env.LOCAL_DB_PASSWORD,
-  //   database: env.LOCAL_DB_NAME,
-  //   // user: env.LOCAL_DB_USER,
-  //   port: Number(env.LOCAL_DB_PORT),
-  //   waitForConnections: true,
-  //   connectionLimit: 10,
-  //   queueLimit: 0,
-  // });
+  // Check if the localDb instance already exists, if not, create it.
+  if (!localDbInstance) {
+    localDbInstance = new mssql.ConnectionPool({
+      user: env.LOCAL_DB_USER,
+      password: env.LOCAL_DB_PASSWORD,
+      server: env.LOCAL_DB_HOST,
+      database: env.LOCAL_DB_NAME,
+      port: Number(env.LOCAL_DB_PORT),
+      options: {
+        trustServerCertificate: true,
+      },
+    });
 
-  // Create a connection pool for the local Microsoft SQL Server database
-  const localDb = new mssql.ConnectionPool({
-    user: env.LOCAL_DB_USER,
-    password: env.LOCAL_DB_PASSWORD,
-    server: env.LOCAL_DB_HOST, // You can use 'localhost\\instance' to connect to named instance
-    database: env.LOCAL_DB_NAME,
-    port: Number(env.LOCAL_DB_PORT),
-    options: {
-      // encrypt: true, // Use this if you're on Windows Azure
-      trustServerCertificate: true, // Change to true for local dev / self-signed certs
-    },
-  });
+    // Connect the localDb instance.
+    await localDbInstance.connect();
+  }
 
-  await localDb.connect();
-  const remoteDb = createPool({
-    uri: env.REMOTE_DATABASE_URL,
-    namedPlaceholders: true,
-  });
+  // Check if the remoteDb instance already exists, if not, create it.
+  if (!remoteDbInstance) {
+    remoteDbInstance = createPool({
+      uri: env.REMOTE_DATABASE_URL,
+      namedPlaceholders: true,
+    });
+  }
 
+  // Return the singleton instances.
   return {
-    localDb,
-    remoteDb,
+    localDb: localDbInstance,
+    remoteDb: remoteDbInstance,
   };
 };
