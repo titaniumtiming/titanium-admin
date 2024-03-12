@@ -17,10 +17,8 @@ export function SyncButton(props: SyncButtonProps) {
       <Button
         className={cn(
           "py-1",
-          syncEnabled
-            ? "bg-green-500 hover:bg-green-500"
-            : "bg-red-500 hover:bg-red-500",
           "text-white",
+          syncEnabled && "bg-green-500 hover:bg-green-500",
         )}
         onClick={() => {
           if (syncEnabled) {
