@@ -23,63 +23,40 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Operation } from "@/components/admin-table/rows";
+import { Operation, SyncDbTableName } from "@/components/admin-table/rows";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import {
+  SetSyncInterval,
+  useDefaultSyncInterval,
+  useSyncIntervalOptions,
+} from "@/lib/use-sync-operation-interval";
 
-export const intervalTypeSchema = z.enum([
-  "default",
-  "slow",
-  "manual",
-  "custom",
-]);
 const FormSchema = z.object({
-  interval: intervalTypeSchema,
+  interval: z.string(),
   customInterval: z.string().optional(),
 });
 
-export type IntervalConfig = z.infer<typeof FormSchema>;
-export const defaultIntervalConfig: IntervalConfig = {
-  interval: "manual",
-};
-
 export type IntervalSelectProps = {
   onRun: () => Promise<unknown>;
-  setIntervalConfig: (intervalConfig: IntervalConfig) => void;
+  dbTableName: SyncDbTableName;
+  setSyncInterval: SetSyncInterval;
 };
 
 export function IntervalSelect(props: IntervalSelectProps) {
-  const { onRun, setIntervalConfig } = props;
+  const { onRun, setSyncInterval, dbTableName } = props;
+
+  const syncIntervalOptions = useSyncIntervalOptions(dbTableName);
+  const defaultValue = useDefaultSyncInterval(dbTableName);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     mode: "onChange",
-    defaultValues: defaultIntervalConfig,
+    defaultValues: {
+      interval: "manual",
+      customInterval: (defaultValue / 1000).toString(),
+    },
   });
-
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    // console.log("SUBMITTING: data", data);
-    setIntervalConfig(data);
-  }
-
-  const options = [
-    {
-      value: "default",
-      label: "Default",
-    },
-    {
-      value: "slow",
-      label: "Slow",
-    },
-    {
-      value: "manual",
-      label: "Manual",
-    },
-    {
-      value: "custom",
-      label: "Custom",
-    },
-  ];
 
   const intervalValue = form.watch("interval");
   const customIntervalValue = form.watch("customInterval");
@@ -87,16 +64,22 @@ export function IntervalSelect(props: IntervalSelectProps) {
   const isCustom = intervalValue === "custom";
 
   useEffect(() => {
-    setIntervalConfig({
-      interval: intervalValue,
-      customInterval: customIntervalValue,
-    });
+    if (!intervalValue) return;
+    if (intervalValue === "manual") return setSyncInterval(null);
+    if (customIntervalValue)
+      return setSyncInterval(parseInt(customIntervalValue) * 1000);
+
+    if (intervalValue === "default" || intervalValue === "slow") {
+      const intervalNumber = parseInt(intervalValue);
+      console.log("intervalNumber: ", intervalNumber);
+      setSyncInterval(intervalNumber);
+    }
   }, [intervalValue, customIntervalValue]);
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(console.log)}
         className="flex flex-1 gap-1"
       >
         <FormField
@@ -104,7 +87,7 @@ export function IntervalSelect(props: IntervalSelectProps) {
           name="interval"
           render={({ field }) => (
             <FormItem
-              className="w-[105px]"
+              className="w-[120px]"
               onClick={() => {
                 console.log("form data: ", form.getValues());
               }}
@@ -116,7 +99,7 @@ export function IntervalSelect(props: IntervalSelectProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {options.map((option) => (
+                  {syncIntervalOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -145,15 +128,19 @@ export function IntervalSelect(props: IntervalSelectProps) {
             control={form.control}
             name="customInterval"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="relative">
                 <FormControl>
                   <Input
                     placeholder="custom interval"
                     type="number"
-                    className="w-[70px]"
+                    className="w-[65px] px-0.5 text-center"
+                    min={2}
                     {...field}
                   />
                 </FormControl>
+                <span className="absolute -bottom-1 left-3.5 text-[10px] text-muted-foreground">
+                  seconds
+                </span>
 
                 <FormMessage />
               </FormItem>

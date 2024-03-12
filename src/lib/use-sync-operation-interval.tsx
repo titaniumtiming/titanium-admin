@@ -1,45 +1,67 @@
 import { SyncDbTableName } from "@/components/admin-table/rows";
-import {
-  IntervalConfig,
-  defaultIntervalConfig,
-} from "@/components/interval-select";
+
 import { syncDbTableNameToInterval } from "@/config";
 import { useInterval } from "@/lib/use-interval";
+import { useGlobalStore } from "@/store";
 import { useMemo, useState } from "react";
 
 export type UseSyncOperationIntervalProps = {
   dbTableName: SyncDbTableName;
   runSyncOperation: () => Promise<unknown>;
 };
+
+export type SetSyncInterval = (interval: number | null) => void;
 export function useSyncOperationInterval(props: UseSyncOperationIntervalProps) {
-  const { runSyncOperation } = props;
-  const [intervalConfig, setIntervalConfig] = useState<IntervalConfig>(
-    defaultIntervalConfig,
+  const { runSyncOperation, dbTableName } = props;
+  const defaultSyncInterval = useDefaultSyncInterval(dbTableName);
+  const [syncInterval, setSyncInterval] = useState<number | null>(
+    defaultSyncInterval,
   );
 
-  const intervalTimeInMs = useMemo(() => {
-    if (intervalConfig.interval === "manual") return null;
-    if (intervalConfig.interval === "custom") {
-      if (!intervalConfig.customInterval) return null;
-      return parseInt(intervalConfig.customInterval, 10);
-    }
+  const syncEnabled = useGlobalStore((state) => state.syncEnabled);
+  const callback = syncEnabled
+    ? runSyncOperation
+    : () => {
+        console.log(
+          "Sync is disabled. Skipping sync operation for ",
+          dbTableName,
+        );
+      };
 
-    if (intervalConfig.interval === "default")
-      return syncDbTableNameToInterval[props.dbTableName].default;
-    if (intervalConfig.interval === "slow")
-      return syncDbTableNameToInterval[props.dbTableName].slow;
-
-    throw new Error("Invalid interval type");
-  }, [
-    intervalConfig.customInterval,
-    intervalConfig.interval,
-    props.dbTableName,
-  ]);
-
-  useInterval(runSyncOperation, intervalTimeInMs);
+  useInterval(callback, syncInterval);
 
   return {
-    intervalConfig,
-    setIntervalConfig,
+    syncInterval,
+    setSyncInterval,
   };
+}
+
+export function useDefaultSyncInterval(dbTableName: SyncDbTableName): number {
+  return syncDbTableNameToInterval[dbTableName].default;
+}
+
+export function useSyncIntervalOptions(dbTableName: SyncDbTableName) {
+  const defaultInterval = useDefaultSyncInterval(dbTableName);
+  const slowInterval = syncDbTableNameToInterval[dbTableName].slow;
+
+  return useMemo(() => {
+    return [
+      {
+        value: defaultInterval.toString(),
+        label: `Default (${defaultInterval / 1000}s)`,
+      },
+      {
+        value: slowInterval.toString(),
+        label: `Slow (${slowInterval / 1000}s)`,
+      },
+      {
+        value: "manual",
+        label: "Manual",
+      },
+      {
+        value: "custom",
+        label: "Custom",
+      },
+    ];
+  }, [defaultInterval, slowInterval]);
 }

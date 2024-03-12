@@ -4,11 +4,7 @@ import {
   operationToApi,
   type Operation,
 } from "@/components/admin-table/rows";
-import {
-  IntervalConfig,
-  IntervalSelect,
-  defaultIntervalConfig,
-} from "@/components/interval-select";
+import { IntervalSelect } from "@/components/interval-select";
 import { StatusDisplay } from "@/components/status-display";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/trpc/react";
@@ -77,7 +73,7 @@ export function Actions(props: ActionsProps) {
     }
   };
 
-  const { setIntervalConfig } = useSyncOperationInterval({
+  const { setSyncInterval, syncInterval } = useSyncOperationInterval({
     dbTableName: operation.dbTableName,
     runSyncOperation,
   });
@@ -87,13 +83,19 @@ export function Actions(props: ActionsProps) {
       <div className="flex items-center gap-1">
         <IntervalSelect
           onRun={runSyncOperation}
-          setIntervalConfig={setIntervalConfig}
+          dbTableName={operation.dbTableName}
+          setSyncInterval={setSyncInterval}
         />
         <div className="flex flex-col">
           <div className="flex items-center gap-1">
-            <StatusDisplay status={status}>
+            <StatusDisplay
+              status={status}
+              className="mx-1 min-w-[110px] flex-1 items-center justify-center"
+            >
               {(status === "success" || status === "error") &&
-                lastRunDuration && <span>({lastRunDuration / 1000}s)</span>}
+                lastRunDuration && (
+                  <span>({(lastRunDuration / 1000).toFixed(1)}s)</span>
+                )}
             </StatusDisplay>
           </div>
         </div>

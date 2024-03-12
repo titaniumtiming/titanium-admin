@@ -7,6 +7,11 @@ export type ServiceContext = {
   remoteDb: ReturnType<typeof createPool>;
 };
 
+/**
+ * TODO: use a signleton pattern to create the service context and return it, otherwise too many connections will be created and the app will crash
+ * @returns
+ */
+
 export const createServiceContext = async (): Promise<ServiceContext> => {
   // // const localDb = createPool(env.LOCAL_DATABASE_URL);
   // const localDb = createPool({

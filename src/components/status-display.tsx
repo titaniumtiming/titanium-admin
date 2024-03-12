@@ -1,5 +1,6 @@
 import { type Status } from "@/components/admin-table/rows";
-import { Badge } from "@/components/ui/badge";
+import { Badge, BadgeProps } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import {
   CheckCircledIcon,
   CircleIcon,
@@ -21,19 +22,23 @@ const statusToVariant = {
   error: "destructive",
 } as const;
 
-export interface StatusDisplayProps {
+export interface StatusDisplayProps extends BadgeProps {
   status: Status;
   statusReason?: string;
   children?: React.ReactNode;
 }
 
 export function StatusDisplay(props: StatusDisplayProps) {
-  const { status } = props;
+  const { status, ...badgeProps } = props;
   const StatusIcon = statusToIcon[status];
   const statusColor = statusToVariant[status];
 
   return (
-    <Badge variant={statusColor} className="flex items-center space-x-1 ">
+    <Badge
+      variant={statusColor}
+      {...badgeProps}
+      className={cn("flex items-center space-x-1 ", props.className)}
+    >
       <StatusIcon className="h-4 w-4" />
       <span className="capitalize">{status}</span>
       {props.children}

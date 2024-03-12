@@ -8,16 +8,16 @@ export const syncDbTableNameToInterval = {
     slow: 30 * seconds,
   },
   "Athlete Splits": {
-    default: 15 * seconds,
-    slow: 30 * seconds,
+    default: 20 * seconds,
+    slow: 40 * seconds,
   },
   Athletes: {
-    default: 15 * seconds,
-    slow: 30 * seconds,
+    default: 10 * seconds,
+    slow: 15 * seconds,
   },
   Events: {
-    default: 15 * seconds,
-    slow: 30 * seconds,
+    default: 40 * seconds,
+    slow: 50 * seconds,
   },
   "Primary Cat": {
     default: 15 * seconds,
