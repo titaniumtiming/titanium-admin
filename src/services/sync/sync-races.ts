@@ -71,90 +71,16 @@ END;
 const pushRacesToRemoteDb = service()
   .input(RaceTableSchema)
   .mutation(async ({ ctx, input }) => {
-    const result = await ctx.mysqlRemoteDb.execute(
-      `
-      INSERT INTO \`dbo.Race\` (
-        RaceId,
-        RaceName,
-        WebName,
-        RaceGroupingId,
-        RaceDate,
-        RaceYear,
-        RoundingTypeId,
-        NetTimeRoundingTypeId,
-        FinishTimePrec,
-        NetTimePrec,
-        RaceLocation,
-        IsEnabled,
-        TitleCaseSettings,
-        LiveResults,
-        ResultsRedirect,
-        ResultsRedirectUrl,
-        RaceWebsite,
-        RaceTwitter,
-        RaceInstagram,
-        RaceFacebook,
-        OrganiserId
-      )
-      VALUES (
-        :RaceId,
-        :RaceName,
-        :WebName,
-        :RaceGroupingId,
-        :RaceDate,
-        :RaceYear,
-        :RoundingTypeId,
-        :NetTimeRoundingTypeId,
-        :FinishTimePrec,
-        :NetTimePrec,
-        :RaceLocation,
-        :IsEnabled,
-        :TitleCaseSettings,
-        :LiveResults,
-        :ResultsRedirect,
-        :ResultsRedirectUrl,
-        :RaceWebsite,
-        :RaceTwitter,
-        :RaceInstagram,
-        :RaceFacebook,
-        :OrganiserId
-      )
-      ON DUPLICATE KEY UPDATE
-        RaceName = VALUES(RaceName),
-        WebName = VALUES(WebName),
-        RaceGroupingId = VALUES(RaceGroupingId),
-        RaceDate = VALUES(RaceDate),
-        RaceYear = VALUES(RaceYear),
-        RoundingTypeId = VALUES(RoundingTypeId),
-        NetTimeRoundingTypeId = VALUES(NetTimeRoundingTypeId),
-        FinishTimePrec = VALUES(FinishTimePrec),
-        NetTimePrec = VALUES(NetTimePrec),
-        RaceLocation = VALUES(RaceLocation),
-        IsEnabled = VALUES(IsEnabled),
-        TitleCaseSettings = VALUES(TitleCaseSettings),
-        LiveResults = VALUES(LiveResults),
-        ResultsRedirect = VALUES(ResultsRedirect),
-        ResultsRedirectUrl = VALUES(ResultsRedirectUrl),
-        RaceWebsite = VALUES(RaceWebsite),
-        RaceTwitter = VALUES(RaceTwitter),
-        RaceInstagram = VALUES(RaceInstagram),
-        RaceFacebook = VALUES(RaceFacebook),
-        OrganiserId = VALUES(OrganiserId);
-    `,
-      convertUndefinedToNull(input),
-    );
-
-    return result;
+    return ctx.bulkInsertIntoRemoteDb({
+      tableName: "dbo.Race",
+      data: [input],
+      updateOnDuplicate: true,
+    });
   });
 export const syncRaces = service().mutation(async ({ ctx }) => {
   const race = await pullRacesFromRacetec(ctx);
 
-  console.log("RACE: ", race);
-
   const pushResult = await pushRacesToRemoteDb(ctx, race);
 
-  // // @ts-expect-error
-  //   const log = "";
-  //   return log;
   return pushResult;
 });
