@@ -7,10 +7,10 @@ import { SyncDbTableName } from "@/schemas";
 import { syncAll } from "@/services/sync-all";
 import { syncEvents } from "@/services/sync-events";
 import { syncRaces } from "@/services/sync-races";
-
+import * as pingServices from "@/services/ping";
 export const syncServices = {
   Races: syncRaces,
-  Events: syncEvents,
+  Events: syncRaces,
   AthleteResults: syncRaces,
   AthleteSplits: syncRaces,
   Athletes: syncRaces,
@@ -22,6 +22,7 @@ export const syncServices = {
 export const serviceRouter = createTRPCRouter({
   sync: createServiceRouter(syncServices),
   syncAll: createTRPCProcedure(syncAll),
+  ping: createServiceRouter(pingServices),
 });
 
 export type ServiceRouter = typeof serviceRouter;

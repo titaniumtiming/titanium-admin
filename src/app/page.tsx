@@ -1,5 +1,6 @@
 import { AdminTable } from "@/components/admin-table";
 import { EventsSelect } from "@/components/events-select";
+import { PingDatabases } from "@/components/ping-databases";
 import { RunAllOnceButton } from "@/components/run-all-once-button";
 import { SyncButton } from "@/components/sync-button";
 
@@ -20,6 +21,7 @@ export default async function Home() {
             </Button>
           </div>
           <div className="flex items-center gap-1">
+            <PingDatabases />
             <EventsSelect />
             <RunAllOnceButton />
 
