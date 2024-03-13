@@ -43,7 +43,7 @@ export const operations = [
   },
   {
     id: "3",
-    dbTableName: "PrimaryCat",
+    dbTableName: "PrimaryCategories",
     status: "success",
     lastUpdated: new Date("2023-06-10T10:20:00"),
     sqlSpeed: 10.2,
@@ -52,7 +52,7 @@ export const operations = [
   },
   {
     id: "4",
-    dbTableName: "SecondaryCat",
+    dbTableName: "SecondaryCategories",
     status: "success",
     lastUpdated: new Date("2023-06-10T10:24:00"),
     sqlSpeed: 10.24,

@@ -18,11 +18,11 @@ export const syncDbTableNameToInterval = {
     default: 40 * seconds,
     slow: 50 * seconds,
   },
-  PrimaryCat: {
+  PrimaryCategories: {
     default: 15 * seconds,
     slow: 30 * seconds,
   },
-  SecondaryCat: {
+  SecondaryCategories: {
     default: 15 * seconds,
     slow: 30 * seconds,
   },
