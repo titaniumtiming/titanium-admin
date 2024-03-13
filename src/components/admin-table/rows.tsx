@@ -42,6 +42,15 @@ export const operations = [
     remoteDbItemsCount: 3,
   },
   {
+    id: "55",
+    dbTableName: "Splits",
+    status: "success",
+    lastUpdated: new Date("2023-06-10T09:51:00"),
+    sqlSpeed: 69.51,
+    localDbItemsCount: 3,
+    remoteDbItemsCount: 3,
+  },
+  {
     id: "3",
     dbTableName: "PrimaryCategories",
     status: "success",
