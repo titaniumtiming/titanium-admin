@@ -36,7 +36,7 @@ export const columns: ColumnDef<Operation>[] = [
     header: ({ column }) => {
       return (
         <DatabaseHeaderCell
-          databaseLabel="Local"
+          databaseLabel="RaceTec"
           databaseTableName="the actual name of the local db"
           onEditDatabaseName={() => {}}
         />

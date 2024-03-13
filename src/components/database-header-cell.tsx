@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Pencil1Icon } from "@radix-ui/react-icons";
 
 export interface DatabaseHeaderCellProps {
-  databaseLabel: "Local" | "Remote";
+  databaseLabel: "RaceTec" | "Remote";
   databaseTableName: string;
   onEditDatabaseName: () => void;
 }

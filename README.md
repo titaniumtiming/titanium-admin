@@ -2,7 +2,7 @@
 
 iteration 1:
 [x]: change default sync interval
-[]: too many connections error (use singleton)
+[x]: too many connections error (use singleton)
 []: all sync queries implemented
 []: change race id (modal)
 []: change local / remote db title

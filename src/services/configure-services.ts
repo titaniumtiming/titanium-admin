@@ -4,13 +4,13 @@ import { createPool } from "mysql2/promise";
 
 // Define a type for the service context to ensure type safety.
 export type ServiceContext = {
-  localDb: mssql.ConnectionPool;
-  remoteDb: ReturnType<typeof createPool>;
+  mssqlRacetecDb: mssql.ConnectionPool;
+  mysqlRemoteDb: ReturnType<typeof createPool>;
 };
 
 // Declare variables to hold the singleton instances.
-let localDbInstance: mssql.ConnectionPool | null = null;
-let remoteDbInstance: ReturnType<typeof createPool> | null = null;
+let mssqlRacetecDb: mssql.ConnectionPool | null = null;
+let mysqlRemoteDb: ReturnType<typeof createPool> | null = null;
 
 /**
  * Creates or returns an existing instance of the service context.
@@ -19,8 +19,8 @@ let remoteDbInstance: ReturnType<typeof createPool> | null = null;
  */
 export const createServiceContext = async (): Promise<ServiceContext> => {
   // Check if the localDb instance already exists, if not, create it.
-  if (!localDbInstance) {
-    localDbInstance = new mssql.ConnectionPool({
+  if (!mssqlRacetecDb) {
+    mssqlRacetecDb = new mssql.ConnectionPool({
       user: env.LOCAL_DB_USER,
       password: env.LOCAL_DB_PASSWORD,
       server: env.LOCAL_DB_HOST,
@@ -32,12 +32,12 @@ export const createServiceContext = async (): Promise<ServiceContext> => {
     });
 
     // Connect the localDb instance.
-    await localDbInstance.connect();
+    await mssqlRacetecDb.connect();
   }
 
   // Check if the remoteDb instance already exists, if not, create it.
-  if (!remoteDbInstance) {
-    remoteDbInstance = createPool({
+  if (!mysqlRemoteDb) {
+    mysqlRemoteDb = createPool({
       uri: env.REMOTE_DATABASE_URL,
       namedPlaceholders: true,
     });
@@ -45,7 +45,7 @@ export const createServiceContext = async (): Promise<ServiceContext> => {
 
   // Return the singleton instances.
   return {
-    localDb: localDbInstance,
-    remoteDb: remoteDbInstance,
+    mssqlRacetecDb,
+    mysqlRemoteDb,
   };
 };

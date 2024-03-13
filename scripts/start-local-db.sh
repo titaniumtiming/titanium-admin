@@ -24,9 +24,9 @@ if [ "$(docker ps -q -f name=$DB_CONTAINER_NAME)" ]; then
   exit 0
 fi
 
-# instead of creating new, for now just exit early. This is to avoid the need to restore the database incase the env variables are wrong. If using db for the first time then comment out the next two lines:
-echo "Could not find a local MSSQL database container. Please check your .env file and try again."
-exit 0
+# # instead of creating new, for now just exit early. This is to avoid the need to restore the database incase the env variables are wrong. If using db for the first time then comment out the next two lines:
+# echo "Could not find a local MSSQL database container. Please check your .env file and try again."
+# exit 0
 
 
 # import env variables from .env
@@ -56,6 +56,10 @@ docker run --name $DB_CONTAINER_NAME \
   -d -p $DB_PORT:1433 \
   mcr.microsoft.com/mssql/server:2019-latest
 
+
+# local-titanium-admin-mssql
+
+
 # echo "Waiting for SQL Server to start up..."
 # # Loop until SQL Server is ready to accept connections
 # until docker exec $DB_CONTAINER_NAME /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P "$DB_PASSWORD" -Q "SELECT 1" &> /dev/null
@@ -66,8 +70,8 @@ docker run --name $DB_CONTAINER_NAME \
 
 # # Copy the .bak file into the container
 # echo "Copying .bak file into the container..."
-# docker cp ./scripts/RaceTec.bak $DB_CONTAINER_NAME:/var/opt/mssql/backup/RaceTec.bak
-# docker cp ./scripts/RaceTec.bak 0761ade9df8408693c7170882988db85359a3cc7fff371e510c233f3fb8a0ae0:/var/opt/mssql/backup/RaceTec.bak
+# docker cp ./scripts/RaceTec.bak local-titanium-admin-mssql:/var/opt/mssql/backup/RaceTec.bak
+
 
 # # Restore the database from the .bak file using sqlcmd
 # echo "Restoring database from .bak file..."

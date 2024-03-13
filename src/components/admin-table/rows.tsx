@@ -12,8 +12,8 @@ export const operationToApi = (
 ): typeof api.sync.Races.useMutation => {
   const parsedName = syncDbTableNameSchema.parse(dbTableName);
 
-  const mutationHook = api.sync["Races"].useMutation;
-  // const mutationHook = api.sync[parsedName].useMutation;
+  // const mutationHook = api.sync["Races"].useMutation;
+  const mutationHook = api.sync[parsedName].useMutation;
 
   if (!mutationHook) {
     throw new Error(`No mutation hook found for ${parsedName}`);
