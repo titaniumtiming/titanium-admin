@@ -90,7 +90,7 @@ iteration 1:
 [x]: change default sync interval
 [x]: too many connections error (use singleton)
 [x]: all sync queries implemented
-[]: test with actual digital ocean
+[-]: test with actual digital ocean
 [x]: set up desktop icon for starting
 [x]: write quick docs in readme
 [-]: change race id (modal)
@@ -99,7 +99,7 @@ iteration 1:
 [x]: add count X seconds until next run (time till text)
 
 interation 2:
-[]: add event parameters
-[]: handle logging
+[-]: add event parameters
+[-]: handle logging
 []: add explanation/user guide
 []: add logo

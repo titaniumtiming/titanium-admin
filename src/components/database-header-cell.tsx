@@ -1,10 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Pencil1Icon, ReloadIcon } from "@radix-ui/react-icons";
+import { Pencil1Icon } from "@radix-ui/react-icons";
 
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -12,9 +11,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DialogClose } from "@radix-ui/react-dialog";
 import { api } from "@/lib/trpc/react";
+import { DialogClose } from "@radix-ui/react-dialog";
 import { toast } from "sonner";
+import React from "react";
 
 export interface DatabaseHeaderCellProps {
   databaseLabel: "RaceTec" | "Remote";
@@ -24,7 +24,16 @@ export interface DatabaseHeaderCellProps {
 export function DatabaseHeaderCell(props: DatabaseHeaderCellProps) {
   const {} = props;
 
-  const { mutateAsync: ping } = api.ping.useMutation();
+  const [response, setResponse] = React.useState<any>(null);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const { mutateAsync: ping } = api.ping.useMutation({
+    onSuccess: (data) => {
+      setResponse(data);
+    },
+    onError: (error) => {
+      setResponse(error);
+    },
+  });
 
   return (
     <div className="flex items-center justify-center p-1">
@@ -38,15 +47,35 @@ export function DatabaseHeaderCell(props: DatabaseHeaderCellProps) {
               type: props.databaseLabel,
             }),
             {
+              dismissible: true,
+              duration: 3000,
               loading: `Pinging ${props.databaseLabel} database...`,
               success: `${props.databaseLabel} database pinged successfully`,
-              error: `Failed to ping ${props.databaseLabel} database`,
+              error: (e) =>
+                `Failed to ping ${props.databaseLabel} database: ${e.message}`,
             },
           );
         }}
       >
         <span className="text-sm">ping</span>
       </Button>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+        }}
+      >
+        {/* <DialogTrigger>Open</DialogTrigger> */}
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sync all details:</DialogTitle>
+            {/* <DialogDescription> */}
+
+            <pre>{JSON.stringify(response, null, 2)}</pre>
+            {/* </DialogDescription> */}
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
       <span>{props.databaseLabel} DB</span>
       <Dialog>
         <DialogTrigger asChild>
