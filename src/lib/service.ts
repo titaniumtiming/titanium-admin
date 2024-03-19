@@ -205,6 +205,7 @@ export function createResolver<
     const maybeParsedOutput = def.outputSchema
       ? def.outputSchema.parse(result)
       : result;
+
     return maybeParsedOutput;
   };
 

@@ -1,6 +1,5 @@
 import { z, infer as zInfer, ZodTypeAny } from "zod";
 
-
 import { Resolver, Service } from "./service";
 import { createTRPCRouter, publicProcedure } from "@/lib/trpc/trpc";
 
@@ -39,11 +38,13 @@ export function createTRPCProcedure<
   if (service.type === "mutation")
     return procedure
       .input(inputSchema)
+      .output(service.outputSchema ?? (z.any() as any))
       .mutation(service.resolver as any) as unknown as ProcedureResult;
 
   if (service.type === "query")
     return procedure
       .input(inputSchema)
+      .output(service.outputSchema ?? (z.any() as any))
       .query(service.resolver as any) as unknown as ProcedureResult;
 
   throw new Error("Type not defined");
