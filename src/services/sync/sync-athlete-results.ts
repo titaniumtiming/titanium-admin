@@ -8,7 +8,7 @@ export const AthleteResultSchema = z.object({
   RaceNo: z.number().nullable(),
   FinishStatusId: z.number(),
   GunTime: z.date().nullable(),
-  EventGunDesc: z.string().nullable(),
+  EventGunDescr: z.string().nullable(), // Updated field name
   NetTime: z.string().nullable(),
   FinishTime: z.date().nullable(),
   DeadZoneTime: z.string().nullable(),
@@ -32,14 +32,16 @@ export const AthleteResultSchema = z.object({
   DistanceDone: z.number().nullable(),
   TeamName: z.string().nullable(),
   TeamType: z.string().nullable(),
-  AthleteTeamPos: z.number().nullable(),
-  TeamPos: z.number().nullable(),
-  TeamTime: z.string().nullable(),
-  TeamResultAthleteCount: z.number().nullable(),
+  TeamPos: z.number().nullable(), // Updated field name
+  TeamTime: z.string().nullable(), // Updated field name
+  TeamPosSum: z.number().nullable(), // Added field
+  TeamLapsSum: z.number().nullable(), // Added field
+  AthletePosInTeam: z.number().nullable(), // Updated field name
+  TeamAthleteCount: z.number().nullable(), // Updated field name
+  TeamMaxAthletesCount: z.number().nullable(), // Added field
   ModifyDate: z.date(),
   EAGUID: z.string(),
 });
-
 export type AthleteResultData = z.infer<typeof AthleteResultSchema>;
 
 const pullAthleteResultsFromRacetec = service()
@@ -63,7 +65,7 @@ const pullAthleteResultsFromRacetec = service()
     ,ea.RaceNo
     ,ea.FinishStatusId
     ,eg.GunTime
-    ,eg.EventGunDescr as [EventGunDesc]
+    ,eg.EventGunDescr --CHANGED DB NAME FROM EventGunDesc to EventGunDescr
     ,ea.NetTime
     ,ea.FinishTime
     ,ea.DeadZoneTime
@@ -79,19 +81,24 @@ const pullAthleteResultsFromRacetec = service()
     ,ea.NetOverallPos
     ,ea.NetCategoryPos
     ,ea.NetGenderPos
+    --MULTILAP INFORMATION
     ,ea.FastestLap
     ,ea.FastestLapNo
     ,ea.SlowestLap
     ,ea.AverageLap
     ,ea.NoLaps
     ,ea.DistanceDone
+    --TEAM INFORMATION
     ,et.TeamName
     ,ett.TeamType
-    -- TODO: CHECK HERE FOR ERROR
-    ,ea.TeamFinishPosition as [AthleteTeamPos]
     ,et.FinishPosition as [TeamPos]
-    ,et.FinishTime as [TeamTime]
-    ,ett.[ResultAthleteCount] as [TeamResultAthleteCount]
+    ,RTSys.dbo.GetFinishTimeDECRs(0, et.FinishTime, 3, 0)  as [TeamTime]
+    ,et.TotalTeamPos as [TeamPosSum]
+    ,et.TeamLaps as [TeamLapsSum]
+    ,ea.TeamFinishPosition as [AthletePosInTeam]
+    ,ett.ResultAthleteCount as [TeamAthleteCount]
+    ,ett.MaxToCount as [TeamMaxAthletesCount]
+    --MODIFICATION INFORMATION
     ,ea.ModifyDate
     ,ea.EAGUID
     
@@ -174,6 +181,7 @@ const pullAthleteResultsFromRacetec = service()
         PRINT 'No race ID found.';
         -- Consider appropriate action if no race ID is found
     END;
+    
     `);
 
     return result.recordset as AthleteResultData[];
