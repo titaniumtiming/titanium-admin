@@ -7,7 +7,7 @@ export interface NextSyncAtProps {
 }
 
 export function NextSyncAt(props: NextSyncAtProps) {
-  const { lastSyncedAt, syncInterval } = props;
+  const { lastSyncedAt = new Date(), syncInterval } = props;
   const [now, setNow] = useState(Date.now());
 
   useInterval(() => {

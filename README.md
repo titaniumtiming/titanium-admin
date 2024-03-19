@@ -93,9 +93,9 @@ iteration 1:
 []: test with actual digital ocean
 [x]: set up desktop icon for starting
 [x]: write quick docs in readme
-[]: change race id (modal)
-[]: change local / remote db title
-[-]: run all once
+[-]: change race id (modal)
+[-]: change local / remote db title
+[x]: run all once
 [x]: add count X seconds until next run (time till text)
 
 interation 2:
