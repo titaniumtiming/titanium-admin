@@ -24,7 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans ${inter.variable}`}>
         <TRPCReactProvider>{children}</TRPCReactProvider>
-        <Toaster />
+        <Toaster richColors theme="light" toastOptions={{}} />
       </body>
     </html>
   );

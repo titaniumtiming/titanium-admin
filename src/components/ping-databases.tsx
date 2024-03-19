@@ -8,26 +8,8 @@ export interface PingDatabasesProps {}
 export function PingDatabases(props: PingDatabasesProps) {
   const {} = props;
 
-  const pingLocalMutation = api.ping.pingRacetecDb.useMutation({
-    onError: (error) => {
-      toast.error("Failed to ping local database");
-      console.error(error);
-    },
-    onSuccess: (d) => {
-      toast.success("Local database pinged");
-      console.log(d);
-    },
-  });
-  const pingRemoteMutation = api.ping.pingRemoteDb.useMutation({
-    onError: (error) => {
-      toast.error("Failed to ping remote database");
-      console.error(error);
-    },
-    onSuccess: (d) => {
-      toast.success("Remote database pinged");
-      console.log(d);
-    },
-  });
+  const pingLocalMutation = api.ping.pingRacetecDb.useMutation();
+  const pingRemoteMutation = api.ping.pingRemoteDb.useMutation();
 
   return (
     <>
@@ -35,7 +17,11 @@ export function PingDatabases(props: PingDatabasesProps) {
         variant={"outline"}
         onClick={() => {
           console.log("Ping local: ");
-          pingLocalMutation.mutateAsync();
+          toast.promise(pingLocalMutation.mutateAsync(), {
+            loading: "Pinging local database...",
+            success: "Local database pinged",
+            error: "Failed to ping local database",
+          });
         }}
       >
         Ping local
@@ -44,7 +30,12 @@ export function PingDatabases(props: PingDatabasesProps) {
         variant={"outline"}
         onClick={() => {
           console.log("Ping remote: ");
-          pingRemoteMutation.mutateAsync();
+
+          toast.promise(pingRemoteMutation.mutateAsync(), {
+            loading: "Pinging remote database...",
+            success: "Remote database pinged",
+            error: "Failed to ping remote database",
+          });
         }}
       >
         Ping remote
