@@ -12,12 +12,22 @@ export interface ActionsProps {
   row: Row<Operation>;
 }
 
+import {
+  DialogDescription,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { formatDate } from "date-fns";
+
 export function Actions(props: ActionsProps) {
   const { row } = props;
 
   const operation = syncTableOperationSchema.parse(row.original);
 
-  const { runSyncOperation, status, lastRunDuration, log } =
+  const { runSyncOperation, status, lastRunDuration, logs } =
     useRunSyncOperation({
       operation,
     });
@@ -48,14 +58,41 @@ export function Actions(props: ActionsProps) {
             </StatusDisplay>
           </div>
         </div>
-        <Button
-          variant={"secondary"}
-          onClick={() => {
-            console.log("log", log);
-          }}
-        >
-          Log
-        </Button>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant={"secondary"}>Log</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Log Details:</DialogTitle>
+            </DialogHeader>
+            {logs.map((log, i) => {
+              return (
+                <>
+                  <div
+                    key={i + operation.dbTableName + log.date.toISOString()}
+                    className="flex flex-col text-center sm:text-left"
+                  >
+                    {log.status === "success" ? (
+                      <span className="text-green-700">Success</span>
+                    ) : (
+                      <span className="text-red-700">Error</span>
+                    )}
+
+                    <span>
+                      Date = {formatDate(log.date, "Pp")}; Duration ={" "}
+                      {(log.duration / 1000).toFixed(1)}s
+                    </span>
+
+                    <pre>{log.message}</pre>
+                  </div>
+                  <hr />
+                </>
+              );
+            })}
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );

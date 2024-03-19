@@ -8,9 +8,16 @@ export type UseRunSyncOperationProps = {
   operation: Operation;
 };
 
+export type Log = {
+  date: Date;
+  duration: number;
+  message: string;
+  status: "success" | "error";
+};
+
 export function useRunSyncOperation(props: UseRunSyncOperationProps) {
   const { operation } = props;
-  const [log, setLog] = useState<string[]>([]);
+  const [logs, setLogs] = useState<Log[]>([]);
 
   const [startedAt, setStartedAt] = useState<Date | null>(null);
   const [endedAt, setEndedAt] = useState<Date | null>(null);
@@ -36,28 +43,51 @@ export function useRunSyncOperation(props: UseRunSyncOperationProps) {
       const endedAt = new Date();
       setEndedAt(endedAt);
       setLastSyncedAt(operation.dbTableName, endedAt);
-      setLog((prev) => [
-        JSON.stringify(result, null, 2),
-        ...prev,
+      setLogs((prev) => {
+        return [
+          {
+            date: startedAt,
+            duration: endedAt.getTime() - startedAt.getTime(),
+            message: JSON.stringify(result, null, 2),
+            status: "success",
+          },
+          ...prev,
+        ];
+      });
 
-        // `Ran operation at ${startedAt.toISOString()} and finished at ${endedAt.toISOString()}`,
-      ]);
+      // setLog((prev) => [
+      //   JSON.stringify(result, null, 2),
+      //   ...prev,
+
+      //   // `Ran operation at ${startedAt.toISOString()} and finished at ${endedAt.toISOString()}`,
+      // ]);
       return result;
     } catch (error) {
       const endedAt = new Date();
       setEndedAt(endedAt);
       setLastSyncedAt(operation.dbTableName, endedAt);
-      setLog((prev) => [
-        ...prev,
-        `Ran operation at ${startedAt.toISOString()} and finished at ${endedAt.toISOString()} with error: ${(error as any)?.message ?? error ?? "unknown"}`,
-      ]);
+      setLogs((prev) => {
+        return [
+          {
+            date: startedAt,
+            duration: endedAt.getTime() - startedAt.getTime(),
+            message: (error as any)?.message ?? error ?? "unknown",
+            status: "error",
+          },
+          ...prev,
+        ];
+      });
+      // setLog((prev) => [
+      //   `Ran operation at ${startedAt.toISOString()} and finished at ${endedAt.toISOString()} with error: ${(error as any)?.message ?? error ?? "unknown"}\n`,
+      //   ...prev,
+      // ]);
       throw error;
     }
   };
 
   return {
     runSyncOperation,
-    log,
+    logs,
     lastRunDuration,
     status,
   };

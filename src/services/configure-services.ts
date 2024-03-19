@@ -41,7 +41,11 @@ export const createServiceContext = async (): Promise<ServiceContext> => {
   // Check if the remoteDb instance already exists, if not, create it.
   if (!mysqlRemoteDb) {
     mysqlRemoteDb = createPool({
-      uri: env.REMOTE_DATABASE_URL,
+      host: env.REMOTE_DB_HOST,
+      user: env.REMOTE_DB_USER,
+      password: env.REMOTE_DB_PASSWORD,
+      database: env.REMOTE_DB_NAME,
+      port: Number(env.REMOTE_DB_PORT),
       namedPlaceholders: true,
     });
   }
