@@ -14,7 +14,7 @@ export const AthleteSchema = z.object({
   AgeCategoryId: z.number().nullable(),
   Category: z.string().nullable(),
   SecondaryCategoryId: z.number().nullable(),
-  SecondCategory: z.string().nullable(),
+  SecondaryCategory: z.string().nullable(),
   EAGUID: z.string(),
 });
 
@@ -46,7 +46,7 @@ const pullAthletesFromRacetec = service()
               ea.AgeCategoryId,
               eac.Category,
               ea.SecondaryCategoryId,
-              esc.Category AS SecondCategory,
+              esc.Category AS SecondaryCategory,
               ea.EAGUID
           FROM
               [Racetec].[dbo].[Athlete] a
