@@ -18,7 +18,7 @@ export function SyncButton(props: SyncButtonProps) {
         className={cn(
           "py-1",
           "text-white",
-          syncEnabled && "bg-green-500 hover:bg-green-500",
+          syncEnabled && "bg-green-700 hover:bg-green-600",
         )}
         onClick={() => {
           if (syncEnabled) {
