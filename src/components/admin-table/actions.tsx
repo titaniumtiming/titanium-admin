@@ -74,16 +74,22 @@ export function Actions(props: ActionsProps) {
                     key={i + operation.dbTableName + log.date.toISOString()}
                     className="flex flex-col text-center sm:text-left"
                   >
-                    {log.status === "success" ? (
-                      <span className="text-green-700">Success</span>
-                    ) : (
-                      <span className="text-red-700">Error</span>
-                    )}
+                    <div className="flex items-center justify-between">
+                      {log.status === "success" ? (
+                        <span className="text-green-700">
+                          {logs.length - i}. Success
+                        </span>
+                      ) : (
+                        <span className="text-red-700">
+                          {logs.length - i}. Error
+                        </span>
+                      )}
 
-                    <span>
-                      Date = {formatDate(log.date, "Pp")}; Duration ={" "}
-                      {(log.duration / 1000).toFixed(1)}s
-                    </span>
+                      <span className="text-muted-foreground">
+                        {formatDate(log.date, "Pp")} (Duration =
+                        {(log.duration / 1000).toFixed(1)}s )
+                      </span>
+                    </div>
 
                     <pre>{log.message}</pre>
                   </div>
