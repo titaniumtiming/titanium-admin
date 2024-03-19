@@ -7,20 +7,12 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    REMOTE_DATABASE_URL: z
-      .string()
-      .url()
-      .refine(
-        (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
-        "You forgot to change the default URL",
-      ),
-    // LOCAL_DATABASE_URL: z
-    //   .string()
-    //   .url()
-    //   .refine(
-    //     (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
-    //     "You forgot to change the default URL",
-    //   ),
+    REMOTE_DB_NAME: z.string(),
+    REMOTE_DB_USER: z.string(),
+    REMOTE_DB_PASSWORD: z.string(),
+    REMOTE_DB_PORT: z.string(),
+    REMOTE_DB_HOST: z.string(),
+
     LOCAL_DB_NAME: z.string(),
     LOCAL_DB_USER: z.string(),
     LOCAL_DB_PASSWORD: z.string(),
@@ -30,6 +22,21 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+
+    // REMOTE_DATABASE_URL: z
+    //   .string()
+    //   .url()
+    //   .refine(
+    //     (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
+    //     "You forgot to change the default URL",
+    //   ),
+    // LOCAL_DATABASE_URL: z
+    //   .string()
+    //   .url()
+    //   .refine(
+    //     (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
+    //     "You forgot to change the default URL",
+    //   ),
   },
 
   /**
@@ -46,8 +53,15 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    REMOTE_DATABASE_URL: process.env.REMOTE_DATABASE_URL,
+    // REMOTE_DATABASE_URL: process.env.REMOTE_DATABASE_URL,
     // LOCAL_DATABASE_URL: process.env.LOCAL_DATABASE_URL,
+
+    REMOTE_DB_NAME: process.env.REMOTE_DB_NAME,
+    REMOTE_DB_USER: process.env.REMOTE_DB_USER,
+    REMOTE_DB_PASSWORD: process.env.REMOTE_DB_PASSWORD,
+    REMOTE_DB_PORT: process.env.REMOTE_DB_PORT,
+    REMOTE_DB_HOST: process.env.REMOTE_DB_HOST,
+
     LOCAL_DB_NAME: process.env.LOCAL_DB_NAME,
     LOCAL_DB_USER: process.env.LOCAL_DB_USER,
     LOCAL_DB_PASSWORD: process.env.LOCAL_DB_PASSWORD,

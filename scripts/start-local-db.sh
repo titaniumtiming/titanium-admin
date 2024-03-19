@@ -59,6 +59,8 @@ docker run --name $DB_CONTAINER_NAME \
 
 # local-titanium-admin-mssql
 
+# docker exec -i a60e0462358f571167e797f8966aa748d3ea43697c16b731a032e9f9ccead3a4 mysql -u root -p eesspeveaGHKc8y3 titanium-admin < /tmp/dump.sql
+
 
 # echo "Waiting for SQL Server to start up..."
 # # Loop until SQL Server is ready to accept connections
