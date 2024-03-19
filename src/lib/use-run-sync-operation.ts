@@ -90,5 +90,6 @@ export function useRunSyncOperation(props: UseRunSyncOperationProps) {
     logs,
     lastRunDuration,
     status,
+    endedAt,
   };
 }

@@ -21,13 +21,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { formatDate } from "date-fns";
+import { useMemo } from "react";
+import { NextSyncAt } from "@/components/admin-table/next-sync-at";
 
 export function Actions(props: ActionsProps) {
   const { row } = props;
 
   const operation = syncTableOperationSchema.parse(row.original);
 
-  const { runSyncOperation, status, lastRunDuration, logs } =
+  const { runSyncOperation, status, lastRunDuration, logs, endedAt } =
     useRunSyncOperation({
       operation,
     });
@@ -45,18 +47,19 @@ export function Actions(props: ActionsProps) {
           dbTableName={operation.dbTableName}
           setSyncInterval={setSyncInterval}
         />
-        <div className="flex flex-col">
-          <div className="flex items-center gap-1">
-            <StatusDisplay
-              status={status}
-              className="mx-1 min-w-[110px] flex-1 items-center justify-center"
-            >
-              {(status === "success" || status === "error") &&
-                lastRunDuration && (
-                  <span>({(lastRunDuration / 1000).toFixed(1)}s)</span>
-                )}
-            </StatusDisplay>
-          </div>
+
+        <div className="flex items-center gap-1">
+          <NextSyncAt lastSyncedAt={endedAt} syncInterval={syncInterval} />
+
+          <StatusDisplay
+            status={status}
+            className="mx-1 min-w-[110px] flex-1 items-center justify-center"
+          >
+            {(status === "success" || status === "error") &&
+              lastRunDuration && (
+                <span>({(lastRunDuration / 1000).toFixed(1)}s)</span>
+              )}
+          </StatusDisplay>
         </div>
 
         <Dialog>
