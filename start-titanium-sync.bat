@@ -3,11 +3,10 @@
 setlocal
 
 
-
-
 REM Set the repository URL and project directory
 set repo_url=https://github.com/DawidWraga/titanium-admin.git
 set project_dir=%USERPROFILE%\titanium-admin
+
 
 REM Check if the project directory exists
 if exist "%project_dir%" (
@@ -25,7 +24,7 @@ REM Check for the existence of .env file
 if exist ".env" (
   echo .env file found.
 ) else (
-  echo ⚠️ ERROR: .env file is missing in the project root.
+  echo  ERROR: .env file is missing in the project root.
   echo Cloning .env.example to .env...
   copy .env.example .env
   echo .env file created from .env.example.
