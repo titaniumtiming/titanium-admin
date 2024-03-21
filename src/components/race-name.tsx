@@ -58,16 +58,16 @@ export function RaceName(props: RaceNameProps) {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Edit Default Race</DialogTitle>
+              <DialogTitle>Edit Default Race ID</DialogTitle>
             </DialogHeader>
 
             <div className="my-2 flex flex-col items-start gap-2">
               <Label htmlFor="name" className="text-right">
-                Name
+                ID
               </Label>
               <Input
-                id="name"
-                defaultValue={defaultRaceDetails?.RaceName}
+                id="id"
+                defaultValue={defaultRaceDetails?.RaceId}
                 className=""
                 autoFocus
               />
