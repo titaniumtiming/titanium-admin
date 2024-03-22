@@ -17,6 +17,15 @@ This is a simple application that syncs the RaceTec database to a remote databas
 ## Configuration
 
 - Go to `/src/config.ts` to change the default / slow sync interval values for each sync type.
+  - MAX_DELETE_COUNT can also be changed here. (This is the maximum number of rows that can be deleted in a single sync. If 0 is set, will skip the delete step)
+
+## Updating
+
+- Open git bash
+- cd ~/titanium-admin
+- git pull
+- pnpm build
+- pnpm start
 
 ## Development
 
