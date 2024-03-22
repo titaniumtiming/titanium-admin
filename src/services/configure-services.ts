@@ -39,15 +39,6 @@ export const createServiceContext = async (): Promise<ServiceContext> => {
   }
 
   // Check if the remoteDb instance already exists, if not, create it.
-  const config = {
-    host: env.REMOTE_DB_HOST,
-    user: env.REMOTE_DB_USER,
-    password: env.REMOTE_DB_PASSWORD,
-    database: env.REMOTE_DB_NAME,
-    port: Number(env.REMOTE_DB_PORT),
-    namedPlaceholders: true,
-  };
-  console.log("config: ", config);
   if (!mysqlRemoteDb) {
     try {
       mysqlRemoteDb = createPool({
@@ -84,54 +75,6 @@ type BulkInsertOrUpdateOptions<T> = {
   logSql?: boolean;
   logParams?: boolean;
 };
-
-export async function bulkInsertOrUpdateOld<T extends Record<string, any>>(
-  options: BulkInsertOrUpdateOptions<T>,
-  executeQuery: (sql: string, params: Record<string, any>) => Promise<any>,
-) {
-  const { tableName, data, updateOnDuplicate } = options;
-
-  if (data.length === 0) return; // Handle empty data case
-
-  // Define the columns based on the keys of the first object in the array
-  // @ts-expect-error
-  const columns = Object.keys(data[0]);
-  const placeholders = data
-    .map(
-      (_, index) =>
-        `(${columns.map((column) => `:${column}${index}`).join(",")})`,
-    )
-    .join(",");
-
-  const sqlBase = `
-    INSERT INTO \`${tableName}\` (${columns.join(", ")})
-    VALUES ${placeholders}
-  `;
-
-  const sqlUpdateOnDuplicate = updateOnDuplicate
-    ? `
-    ON DUPLICATE KEY UPDATE
-    ${columns.map((column) => `${column} = VALUES(${column})`).join(", ")}
-  `
-    : "";
-
-  const sql = sqlBase + sqlUpdateOnDuplicate;
-
-  // Map the array of objects to a single object with unique keys for each placeholder
-  const namedParameters = data.reduce((acc, currentItem, index) => {
-    columns.forEach((column) => {
-      // @ts-expect-error
-      acc[`${column}${index}`] = currentItem[column];
-    });
-    return acc;
-  }, {});
-
-  options.logSql && console.log("sql: ", sql);
-  options.logParams && console.log("params: ", namedParameters);
-
-  // Execute the SQL query with the constructed SQL statement and parameters
-  return executeQuery(sql, namedParameters);
-}
 
 export async function bulkInsertOrUpdate<T extends Record<string, any>>(
   options: BulkInsertOrUpdateOptions<T>,
