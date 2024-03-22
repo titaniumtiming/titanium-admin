@@ -10,7 +10,7 @@
     "db:start-remote": "bash ./scripts/start-remote-db.sh",
     "db:start": "pnpm run db:start-local && pnpm run db:start-remote",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start -p 3333"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
