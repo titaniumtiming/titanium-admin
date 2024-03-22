@@ -9,11 +9,11 @@ export const AthleteResultSchema = z.object({
   FinishStatusId: z.number(),
   GunTime: z.date().nullable(),
   EventGunDescr: z.string().nullable(), // Updated field name
-  NetTime: z.string().nullable(),
+  NetTime: z.date().nullable(),
   FinishTime: z.date().nullable(),
-  DeadZoneTime: z.string().nullable(),
+  DeadZoneTime: z.date().nullable(),
   FinishTOD: z.date().nullable(),
-  PenaltyTime: z.string().nullable(),
+  PenaltyTime: z.date().nullable(),
   TimeBehindOverall: z.string().nullable(),
   TimeBehindCateg: z.string().nullable(),
   TimeBehindGender: z.string().nullable(),
@@ -33,7 +33,7 @@ export const AthleteResultSchema = z.object({
   TeamName: z.string().nullable(),
   TeamType: z.string().nullable(),
   TeamPos: z.number().nullable(), // Updated field name
-  TeamTime: z.string().nullable(), // Updated field name
+  TeamTime: z.date().nullable(), // Updated field name
   TeamPosSum: z.number().nullable(), // Added field
   TeamLapsSum: z.number().nullable(), // Added field
   AthletePosInTeam: z.number().nullable(), // Updated field name
