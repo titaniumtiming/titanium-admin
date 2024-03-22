@@ -35,3 +35,4 @@ export const syncDbTableNameToInterval = {
     slow: 30 * seconds,
   },
 } satisfies Record<SyncDbTableName, { default: number; slow: number }>;
+export const MAX_DELETE_COUNT = 10;

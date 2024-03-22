@@ -1,3 +1,4 @@
+import { MAX_DELETE_COUNT } from "@/config";
 import { env } from "@/env";
 import mssql from "mssql";
 import { createPool, escape } from "mysql2/promise";
@@ -11,6 +12,7 @@ export type ServiceContext = {
   ) => Promise<unknown>;
   deleteFromRemoteIfNotInRacetec: <TItem>(
     options: Omit<
+      // @ts-expect-error
       DeleteFromRemoteIfNotInRacetecOptions<TItem>,
       "mysqlRemoteDb"
     >,
@@ -71,7 +73,8 @@ export const createServiceContext = async (): Promise<ServiceContext> => {
         return result;
       });
     },
-    deleteFromRemoteIfNotInRacetec: async <TItem>(
+    // @ts-expect-error
+    deleteFromRemoteIfNotInRacetec: async <TItem extends { RaceId: string }>(
       options: Omit<
         DeleteFromRemoteIfNotInRacetecOptions<TItem>,
         "mysqlRemoteDb"
@@ -85,6 +88,17 @@ export const createServiceContext = async (): Promise<ServiceContext> => {
     },
   };
 };
+
+/**
+ * !NOTE: THESE FUNCTIONS SHOULD NOT BE USED OUTSIDE OF INTERNAL ADMIN TOOL CONTEXT.
+ * (both bulkInsertOrUpdate and deleteFromRemoteIfNotInRacetec)
+ *
+ * We are using direct string interpolation to construct SQL queries, which is unsafe and can lead to SQL injection attacks.
+ *
+ * This is fine as the tool only runs locally and is not exposed to the any untrusted users.
+ *
+ * But if you are building a public facing API, you should use parameterized queries to prevent SQL injection attacks.
+ */
 
 type BulkInsertOrUpdateOptions<T> = {
   tableName: string;
@@ -143,58 +157,57 @@ export async function bulkInsertOrUpdate<T extends Record<string, any>>(
   }
 }
 
-export type DeleteFromRemoteIfNotInRacetecOptions<TItem> = {
+export type DeleteFromRemoteIfNotInRacetecOptions<
+  TItem extends { RaceId: string },
+> = {
   compositeKey: (keyof TItem)[];
   tableName: string;
   itemsInRacetec: TItem[];
   mysqlRemoteDb: ReturnType<typeof createPool>;
 };
 
-const deleteFromRemoteIfNotInRacetec = async <TItem>(
+const deleteFromRemoteIfNotInRacetec = async <TItem extends { RaceId: string }>(
   options: DeleteFromRemoteIfNotInRacetecOptions<TItem>,
 ) => {
   const { compositeKey, tableName, itemsInRacetec, mysqlRemoteDb } = options;
 
-  // Get the composite key values from the items in Racetec
-  const racetecCompositeKeys = itemsInRacetec.map((item) => {
-    return compositeKey.reduce((acc, key) => {
-      acc[key] = item[key];
-      return acc;
-    }, {} as Partial<TItem>);
-  });
+  if (itemsInRacetec.length === 0) {
+    // console.log(`No items in Racetec. Skipping deletion. Table: ${tableName} `);
+    return;
+  }
 
-  // Construct the WHERE clause for the SELECT query
-  const selectQueryWhereClause = racetecCompositeKeys
-    .map((keys) => {
-      return `(${compositeKey
-        .map((key) => `${key as string} = '${keys[key]}'`)
-        .join(" AND ")})`;
+  if ((MAX_DELETE_COUNT as number) === 0) {
+    // console.warn("MAX_DELETE_COUNT is set to 0. Skipping deletion.");
+    return;
+  }
+
+  const raceId = itemsInRacetec[0]?.RaceId;
+
+  // Construct the subquery to find the composite key values in Racetec
+  const racetecCompositeKeysSubquery = itemsInRacetec
+    .map((item) => {
+      return `(${compositeKey.map((key) => `'${item[key]}'`).join(", ")})`;
     })
-    .join(" OR ");
+    .join(", ");
 
-  const selectQuery = `SELECT ${compositeKey.join(
-    ", ",
-  )} FROM \`${tableName}\` WHERE ${selectQueryWhereClause}`;
-  const [selectedItems] = await mysqlRemoteDb.execute(selectQuery);
+  // Construct the DELETE query with a subquery to find the items not in Racetec
+  const deleteQuery = `
+    DELETE FROM \`${tableName}\`
+    WHERE RaceId = ${raceId}
+    AND (${compositeKey.join(", ")}) NOT IN (
+      ${racetecCompositeKeysSubquery}
+    )
+    LIMIT ${MAX_DELETE_COUNT}
+  `;
 
-  // Find the items in the remote database that are not in Racetec
-  const itemsToDelete = (selectedItems as TItem[]).filter((remoteItem) => {
-    return !racetecCompositeKeys.some((racetecKeys) => {
-      return compositeKey.every((key) => remoteItem[key] === racetecKeys[key]);
-    });
-  });
+  const [result] = await mysqlRemoteDb.execute(deleteQuery);
+  const deletedCount = (result as any).affectedRows;
 
-  if (itemsToDelete.length > 0) {
-    // Construct the WHERE clause for the DELETE query
-    const deleteQueryWhereClause = itemsToDelete
-      .map((item) => {
-        return `(${compositeKey
-          .map((key) => `${key as string} = '${item[key]}'`)
-          .join(" AND ")})`;
-      })
-      .join(" OR ");
+  console.log(`Deleted ${deletedCount} items from ${tableName}`);
 
-    const deleteQuery = `DELETE FROM \`${tableName}\` WHERE ${deleteQueryWhereClause}`;
-    await mysqlRemoteDb.execute(deleteQuery);
+  if (deletedCount === MAX_DELETE_COUNT) {
+    console.warn(
+      `Maximum delete count of ${MAX_DELETE_COUNT} reached. Some items may not have been deleted.`,
+    );
   }
 };
