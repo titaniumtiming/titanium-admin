@@ -1,3 +1,4 @@
+import { useGlobalStore } from "@/store";
 import { useEffect, useRef } from "react";
 
 /**
@@ -9,6 +10,8 @@ import { useEffect, useRef } from "react";
 export function useInterval(callback: () => void, delay: number | null): void {
   const savedCallback = useRef<() => void>();
 
+  const isEnabled = useGlobalStore((s) => s.syncEnabled);
+
   // Remember the latest callback.
   useEffect(() => {
     savedCallback.current = callback;
@@ -16,13 +19,16 @@ export function useInterval(callback: () => void, delay: number | null): void {
 
   // Set up the interval.
   useEffect(() => {
+    if (!delay) return;
+    if (!isEnabled) {
+      return;
+    }
+
     function tick() {
       savedCallback.current!();
     }
 
-    if (delay !== null) {
-      let id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
+    let id = setInterval(tick, delay);
+    return () => clearInterval(id);
+  }, [delay, isEnabled]);
 }
