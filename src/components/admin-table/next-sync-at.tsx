@@ -7,7 +7,12 @@ export interface NextSyncAtProps {
 }
 
 export function NextSyncAt(props: NextSyncAtProps) {
-  const { lastSyncedAt = new Date(), syncInterval } = props;
+  const { lastSyncedAt: _lastSyncAt, syncInterval } = props;
+
+  const lastSyncedAt = useMemo(() => {
+    return _lastSyncAt ?? new Date();
+  }, [_lastSyncAt]);
+
   const [now, setNow] = useState(Date.now());
 
   useInterval(() => {
@@ -18,6 +23,13 @@ export function NextSyncAt(props: NextSyncAtProps) {
     if (!lastSyncedAt || !syncInterval) return null;
     return lastSyncedAt.getTime() + syncInterval - now;
   }, [lastSyncedAt, syncInterval, now]);
+
+  console.log("NEXT SYNC AT: ", {
+    timeTillNextSync,
+    lastSyncedAt,
+    syncInterval,
+    now,
+  });
 
   if (!timeTillNextSync) return null;
 
