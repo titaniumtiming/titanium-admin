@@ -1,6 +1,6 @@
 import { env } from "@/env";
 import mssql from "mssql";
-import { createPool } from "mysql2/promise";
+import { createPool, escape } from "mysql2/promise";
 
 // Define a type for the service context to ensure type safety.
 export type ServiceContext = {
@@ -39,15 +39,29 @@ export const createServiceContext = async (): Promise<ServiceContext> => {
   }
 
   // Check if the remoteDb instance already exists, if not, create it.
+  const config = {
+    host: env.REMOTE_DB_HOST,
+    user: env.REMOTE_DB_USER,
+    password: env.REMOTE_DB_PASSWORD,
+    database: env.REMOTE_DB_NAME,
+    port: Number(env.REMOTE_DB_PORT),
+    namedPlaceholders: true,
+  };
+  console.log("config: ", config);
   if (!mysqlRemoteDb) {
-    mysqlRemoteDb = createPool({
-      host: env.REMOTE_DB_HOST,
-      user: env.REMOTE_DB_USER,
-      password: env.REMOTE_DB_PASSWORD,
-      database: env.REMOTE_DB_NAME,
-      port: Number(env.REMOTE_DB_PORT),
-      namedPlaceholders: true,
-    });
+    try {
+      mysqlRemoteDb = createPool({
+        host: env.REMOTE_DB_HOST,
+        user: env.REMOTE_DB_USER,
+        password: env.REMOTE_DB_PASSWORD,
+        database: env.REMOTE_DB_NAME,
+        port: Number(env.REMOTE_DB_PORT),
+        namedPlaceholders: true,
+        // debug: true,
+      })!;
+    } catch (error) {
+      throw new Error("my sql connection error: " + error);
+    }
   }
 
   // Return the singleton instances.
@@ -71,7 +85,7 @@ type BulkInsertOrUpdateOptions<T> = {
   logParams?: boolean;
 };
 
-export async function bulkInsertOrUpdate<T extends Record<string, any>>(
+export async function bulkInsertOrUpdateOld<T extends Record<string, any>>(
   options: BulkInsertOrUpdateOptions<T>,
   executeQuery: (sql: string, params: Record<string, any>) => Promise<any>,
 ) {
@@ -117,4 +131,52 @@ export async function bulkInsertOrUpdate<T extends Record<string, any>>(
 
   // Execute the SQL query with the constructed SQL statement and parameters
   return executeQuery(sql, namedParameters);
+}
+
+export async function bulkInsertOrUpdate<T extends Record<string, any>>(
+  options: BulkInsertOrUpdateOptions<T>,
+  executeQuery: (sql: string, params: Record<string, any>) => Promise<any>,
+) {
+  const { tableName, data, updateOnDuplicate } = options;
+
+  if (data.length === 0) return; // Handle empty data case
+
+  // Define the columns based on the keys of the first object in the array
+  // @ts-expect-error
+  const columns = Object.keys(data[0]);
+
+  // Split the data into chunks
+  const chunkSize = 50000;
+  const chunks = [];
+  for (let i = 0; i < data.length; i += chunkSize) {
+    chunks.push(data.slice(i, i + chunkSize));
+  }
+
+  // Process each chunk
+  for (const chunk of chunks) {
+    const values = chunk
+      .map(
+        (row) => `(${columns.map((column) => escape(row[column])).join(",")})`,
+      )
+      .join(",");
+
+    const sqlBase = `
+      INSERT INTO \`${tableName}\` (${columns.join(", ")})
+      VALUES ${values}
+    `;
+
+    const sqlUpdateOnDuplicate = updateOnDuplicate
+      ? `
+      ON DUPLICATE KEY UPDATE
+      ${columns.map((column) => `${column} = VALUES(${column})`).join(", ")}
+    `
+      : "";
+
+    const sql = sqlBase + sqlUpdateOnDuplicate;
+
+    options.logSql && console.log("sql: ", sql);
+
+    // Execute the SQL query for the current chunk
+    await executeQuery(sql, {});
+  }
 }
