@@ -24,13 +24,6 @@ export function NextSyncAt(props: NextSyncAtProps) {
     return lastSyncedAt.getTime() + syncInterval - now;
   }, [lastSyncedAt, syncInterval, now]);
 
-  console.log("NEXT SYNC AT: ", {
-    timeTillNextSync,
-    lastSyncedAt,
-    syncInterval,
-    now,
-  });
-
   if (!timeTillNextSync) return null;
 
   return (
