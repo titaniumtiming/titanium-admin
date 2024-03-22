@@ -51,7 +51,7 @@ export const syncTableOperationSchema = z.object({
   status: statusSchema,
   lastUpdated: z.date(),
   sqlSpeed: z.number(),
-  localDbItemsCount: z.number(),
-  remoteDbItemsCount: z.number(),
+  localDbItemsCount: z.any(),
+  remoteDbItemsCount: z.any(),
 });
 export type Operation = z.infer<typeof syncTableOperationSchema>;
