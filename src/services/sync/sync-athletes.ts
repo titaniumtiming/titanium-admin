@@ -8,8 +8,7 @@ export const AthleteSchema = z.object({
   RaceNo: z.number().nullable(),
   FirstName: z.string(),
   LastName: z.string(),
-  GenderId: z.number(),
-
+  GenderId: z.number().nullable(),
   ClubName: z.string().nullable(),
   AgeCategoryId: z.number().nullable(),
   Category: z.string().nullable(),

@@ -7,10 +7,10 @@ export const SplitSchema = z.object({
   SplitId: z.number(),
   SplitOrder: z.number(),
   SplitName: z.string(),
-  SplitWebName: z.string(),
+  SplitWebName: z.string().nullable(),
   SplitTypeId: z.number(),
-  DistanceFromStart: z.number(),
-  IsDeadZone: z.boolean(),
+  DistanceFromStart: z.number().nullable(),
+  IsDeadZone: z.boolean().nullable(),
 });
 
 export type SplitData = z.infer<typeof SplitSchema>;

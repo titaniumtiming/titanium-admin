@@ -5,12 +5,12 @@ export const PrimaryCategorySchema = z.object({
   RaceId: z.number(),
   EventId: z.number(),
   AgeCategoryId: z.number(),
-  CategoryCode: z.string(),
+  CategoryCode: z.string().nullable(),
   Category: z.string(),
   CategoryOrder: z.number(),
   MaleRecord: z.date().nullable(),
   FemaleRecord: z.union([z.date().nullable(), z.string().nullable()]),
-  GenderId: z.number(),
+  GenderId: z.number().nullable(),
 });
 
 export type PrimaryCategoryData = z.infer<typeof PrimaryCategorySchema>;

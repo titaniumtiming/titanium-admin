@@ -7,10 +7,10 @@ export const EventTableSchema = z.object({
   EventDescr: z.string(),
   WebName: z.string(),
   EventOrder: z.number(),
-  EventSpeedDist: z.number(),
+  EventSpeedDist: z.number().nullable(),
   EventSpeedPostFix: z.string().nullable(),
   EventIsEnabled: z.number(),
-  IsMultiLap: z.number(),
+  IsMultiLap: z.number().nullable(),
 });
 
 export type EventTableData = z.infer<typeof EventTableSchema>;
