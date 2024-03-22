@@ -9,6 +9,12 @@ export type ServiceContext = {
   bulkInsertIntoRemoteDb: <T>(
     options: BulkInsertOrUpdateOptions<T>,
   ) => Promise<unknown>;
+  deleteFromRemoteIfNotInRacetec: <TItem>(
+    options: Omit<
+      DeleteFromRemoteIfNotInRacetecOptions<TItem>,
+      "mysqlRemoteDb"
+    >,
+  ) => Promise<void>;
 };
 
 // Declare variables to hold the singleton instances.
@@ -65,6 +71,18 @@ export const createServiceContext = async (): Promise<ServiceContext> => {
         return result;
       });
     },
+    deleteFromRemoteIfNotInRacetec: async <TItem>(
+      options: Omit<
+        DeleteFromRemoteIfNotInRacetecOptions<TItem>,
+        "mysqlRemoteDb"
+      >,
+    ) => {
+      Object.assign(options, { mysqlRemoteDb });
+      return deleteFromRemoteIfNotInRacetec({
+        ...options,
+        mysqlRemoteDb: mysqlRemoteDb!,
+      });
+    },
   };
 };
 
@@ -89,6 +107,7 @@ export async function bulkInsertOrUpdate<T extends Record<string, any>>(
   const columns = Object.keys(data[0]);
 
   // Split the data into chunks
+  // Otherwise the athlete results query can be too large (causes error 1390: Prepared statement contains too many placeholders)
   const chunkSize = 50000;
   const chunks = [];
   for (let i = 0; i < data.length; i += chunkSize) {
@@ -123,3 +142,59 @@ export async function bulkInsertOrUpdate<T extends Record<string, any>>(
     await executeQuery(sql, {});
   }
 }
+
+export type DeleteFromRemoteIfNotInRacetecOptions<TItem> = {
+  compositeKey: (keyof TItem)[];
+  tableName: string;
+  itemsInRacetec: TItem[];
+  mysqlRemoteDb: ReturnType<typeof createPool>;
+};
+
+const deleteFromRemoteIfNotInRacetec = async <TItem>(
+  options: DeleteFromRemoteIfNotInRacetecOptions<TItem>,
+) => {
+  const { compositeKey, tableName, itemsInRacetec, mysqlRemoteDb } = options;
+
+  // Get the composite key values from the items in Racetec
+  const racetecCompositeKeys = itemsInRacetec.map((item) => {
+    return compositeKey.reduce((acc, key) => {
+      acc[key] = item[key];
+      return acc;
+    }, {} as Partial<TItem>);
+  });
+
+  // Construct the WHERE clause for the SELECT query
+  const selectQueryWhereClause = racetecCompositeKeys
+    .map((keys) => {
+      return `(${compositeKey
+        .map((key) => `${key as string} = '${keys[key]}'`)
+        .join(" AND ")})`;
+    })
+    .join(" OR ");
+
+  const selectQuery = `SELECT ${compositeKey.join(
+    ", ",
+  )} FROM \`${tableName}\` WHERE ${selectQueryWhereClause}`;
+  const [selectedItems] = await mysqlRemoteDb.execute(selectQuery);
+
+  // Find the items in the remote database that are not in Racetec
+  const itemsToDelete = (selectedItems as TItem[]).filter((remoteItem) => {
+    return !racetecCompositeKeys.some((racetecKeys) => {
+      return compositeKey.every((key) => remoteItem[key] === racetecKeys[key]);
+    });
+  });
+
+  if (itemsToDelete.length > 0) {
+    // Construct the WHERE clause for the DELETE query
+    const deleteQueryWhereClause = itemsToDelete
+      .map((item) => {
+        return `(${compositeKey
+          .map((key) => `${key as string} = '${item[key]}'`)
+          .join(" AND ")})`;
+      })
+      .join(" OR ");
+
+    const deleteQuery = `DELETE FROM \`${tableName}\` WHERE ${deleteQueryWhereClause}`;
+    await mysqlRemoteDb.execute(deleteQuery);
+  }
+};

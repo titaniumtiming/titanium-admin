@@ -2,9 +2,9 @@ import { service } from "@/lib/service";
 import { z } from "zod";
 
 export const SecondaryCategorySchema = z.object({
-  RaceId: z.number(),
-  EventId: z.number(),
-  AgeCategoryId: z.number(),
+  RaceId: z.number(), // *
+  EventId: z.number(), // *
+  AgeCategoryId: z.number(), // *
   CategoryCode: z.string().nullable(),
   Category: z.string(),
   CategoryOrder: z.number(),
@@ -14,6 +14,12 @@ export const SecondaryCategorySchema = z.object({
 });
 
 export type SecondaryCategoryData = z.infer<typeof SecondaryCategorySchema>;
+
+export const SecondaryCategoryCompositeKey = [
+  "RaceId",
+  "EventId",
+  "AgeCategoryId",
+] satisfies Partial<keyof SecondaryCategoryData>[];
 
 const pullSecondaryCategoriesFromRacetec = service()
   .output(z.array(SecondaryCategorySchema))
@@ -76,5 +82,11 @@ export const syncSecondaryCategories = service().mutation(async ({ ctx }) => {
     ctx,
     secondaryCategories,
   );
+
+  await ctx.deleteFromRemoteIfNotInRacetec({
+    compositeKey: SecondaryCategoryCompositeKey,
+    tableName: "dbo.EventSecondaryCategory",
+    itemsInRacetec: secondaryCategories,
+  });
   return pushResult;
 });

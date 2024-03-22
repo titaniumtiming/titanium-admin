@@ -2,9 +2,9 @@ import { service } from "@/lib/service";
 import { z } from "zod";
 
 export const SplitSchema = z.object({
-  RaceId: z.number(),
-  EventId: z.number(),
-  SplitId: z.number(),
+  RaceId: z.number(), // *
+  EventId: z.number(), // *
+  SplitId: z.number(), // *
   SplitOrder: z.number(),
   SplitName: z.string(),
   SplitWebName: z.string().nullable(),
@@ -14,6 +14,12 @@ export const SplitSchema = z.object({
 });
 
 export type SplitData = z.infer<typeof SplitSchema>;
+
+const SlitSchemaCompositeKey = [
+  "RaceId",
+  "EventId",
+  "SplitId",
+] satisfies Partial<keyof SplitData>[];
 
 const pullSplitsFromRacetec = service()
   .output(z.array(SplitSchema))
@@ -67,5 +73,10 @@ const pushSplitsToRemoteDb = service()
 export const syncSplits = service().mutation(async ({ ctx }) => {
   const splits = await pullSplitsFromRacetec(ctx);
   const pushResult = await pushSplitsToRemoteDb(ctx, splits);
+  const deleteResult = await ctx.deleteFromRemoteIfNotInRacetec({
+    compositeKey: SlitSchemaCompositeKey,
+    tableName: "dbo.EventSplit",
+    itemsInRacetec: splits,
+  });
   return pushResult;
 });

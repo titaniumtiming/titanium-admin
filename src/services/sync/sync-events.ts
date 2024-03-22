@@ -2,8 +2,8 @@ import { service } from "@/lib/service";
 import { z } from "zod";
 
 export const EventTableSchema = z.object({
-  RaceId: z.number(),
-  EventId: z.number(),
+  RaceId: z.number(), // *
+  EventId: z.number(), // *
   EventDescr: z.string(),
   WebName: z.string(),
   EventOrder: z.number(),
@@ -14,6 +14,10 @@ export const EventTableSchema = z.object({
 });
 
 export type EventTableData = z.infer<typeof EventTableSchema>;
+
+export const EventTableCompositeKey = ["RaceId", "EventId"] satisfies Partial<
+  keyof EventTableData
+>[];
 
 const pullEventsFromRacetec = service()
   .output(z.array(EventTableSchema))
@@ -74,5 +78,10 @@ export const syncEvents = service().mutation(async ({ ctx }) => {
   const events = await pullEventsFromRacetec(ctx);
 
   const pushResult = await pushEventsToRemoteDb(ctx, events);
+  const deleteResult = await ctx.deleteFromRemoteIfNotInRacetec({
+    compositeKey: EventTableCompositeKey,
+    tableName: "dbo.RaceEvent",
+    itemsInRacetec: events,
+  });
   return pushResult;
 });

@@ -2,9 +2,9 @@ import { service } from "@/lib/service";
 import { z } from "zod";
 
 export const AthleteResultSchema = z.object({
-  RaceId: z.number(),
-  EventId: z.number(),
-  AthleteId: z.number(),
+  RaceId: z.number(), // *
+  EventId: z.number(), // *
+  AthleteId: z.number(), // *
   RaceNo: z.number().nullable(),
   FinishStatusId: z.number(),
   GunTime: z.date().nullable(),
@@ -43,6 +43,12 @@ export const AthleteResultSchema = z.object({
   EAGUID: z.string(),
 });
 export type AthleteResultData = z.infer<typeof AthleteResultSchema>;
+
+export const AthleteResultCompositeKey = [
+  "RaceId",
+  "EventId",
+  "AthleteId",
+] satisfies Partial<keyof AthleteResultData>[];
 
 const pullAthleteResultsFromRacetec = service()
   .output(z.array(AthleteResultSchema))
@@ -200,5 +206,10 @@ const pushAthleteResultsToRemoteDb = service()
 export const syncAthleteResults = service().mutation(async ({ ctx }) => {
   const athleteResults = await pullAthleteResultsFromRacetec(ctx);
   const pushResult = await pushAthleteResultsToRemoteDb(ctx, athleteResults);
+  await ctx.deleteFromRemoteIfNotInRacetec({
+    compositeKey: AthleteResultCompositeKey,
+    tableName: "dbo.EventAthleteResults",
+    itemsInRacetec: athleteResults,
+  });
   return pushResult;
 });

@@ -2,9 +2,9 @@ import { service } from "@/lib/service";
 import { z } from "zod";
 
 export const AthleteSchema = z.object({
-  RaceId: z.number(),
-  EventId: z.number(),
-  AthleteId: z.number(),
+  RaceId: z.number(), // *
+  EventId: z.number(), // *
+  AthleteId: z.number(), // *
   RaceNo: z.number().nullable(),
   FirstName: z.string(),
   LastName: z.string(),
@@ -17,6 +17,77 @@ export const AthleteSchema = z.object({
   EAGUID: z.string(),
 });
 
+export const AthleteCompositeKey = [
+  "RaceId",
+  "EventId",
+  "AthleteId",
+] satisfies Partial<keyof AthleteData>[];
+
+/**
+ 
+unchanging
+
+
+
+
+function deleteFromRemoteIfNotInRaceTec(options: {
+  key: compositeKey or singular key
+
+tableToCheck
+
+itemsinRactec
+
+
+}) {
+
+  const itemsInRemoteDatabase = getFromRemoteByCompositeKey([raceId, eventId, athleteId])
+
+  const itemsInRemoteButNotInRaceTec = itemsInRemoteDatabase.filter(item => {
+    ...
+  );
+
+  for each item in itemsInRemoteButNotInRaceTec {
+  delete(item)
+}
+
+}
+
+
+
+//batchAll
+const itemsInRemoteDatabase = getFromRemoteByCompositeKey([raceId, eventId, athleteId])
+
+const itemsInRemoteButNotInRaceTec = itemsInRemoteDatabase.filter(item => {
+  ...
+}
+
+
+for each item in itemsInRemoteButNotInRaceTec {
+  delete(item)
+}
+
+
+
+
+if( 
+  X exists in remote db 
+  and
+  X NOT exists in racetec
+) {
+  delete
+}
+
+where x all of [raceId, eventId, athleteId, EAGUID?]
+
+
+
+
+
+
+
+
+
+ */
 export type AthleteData = z.infer<typeof AthleteSchema>;
 
 const pullAthletesFromRacetec = service()
@@ -88,5 +159,11 @@ const pushAthletesToRemoteDb = service()
 export const syncAthletes = service().mutation(async ({ ctx }) => {
   const athletes = await pullAthletesFromRacetec(ctx);
   const pushResult = await pushAthletesToRemoteDb(ctx, athletes);
+
+  await ctx.deleteFromRemoteIfNotInRacetec({
+    compositeKey: AthleteCompositeKey,
+    tableName: "dbo.EventAthleteBio",
+    itemsInRacetec: athletes,
+  });
   return pushResult;
 });

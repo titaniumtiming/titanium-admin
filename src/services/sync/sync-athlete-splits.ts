@@ -2,9 +2,9 @@ import { service } from "@/lib/service";
 import { z } from "zod";
 
 export const AthleteSplitSchema = z.object({
-  RaceId: z.number(),
-  EventId: z.number(),
-  AthleteId: z.number(),
+  RaceId: z.number(), // *
+  EventId: z.number(), // *
+  AthleteId: z.number(), // *
   SplitId: z.number(),
   PrevSplitId: z.number().nullable(),
   PrevLegId: z.number().nullable(),
@@ -27,6 +27,12 @@ export const AthleteSplitSchema = z.object({
 });
 
 export type AthleteSplitData = z.infer<typeof AthleteSplitSchema>;
+
+export const AthleteSplitCompositeKey = [
+  "RaceId",
+  "EventId",
+  "AthleteId",
+] satisfies Partial<keyof AthleteSplitData>[];
 
 const pullAthleteSplitsFromRacetec = service()
   .output(z.array(AthleteSplitSchema))
@@ -160,5 +166,10 @@ const pushAthleteSplitsToRemoteDb = service()
 export const syncAthleteSplits = service().mutation(async ({ ctx }) => {
   const athleteSplits = await pullAthleteSplitsFromRacetec(ctx);
   const pushResult = await pushAthleteSplitsToRemoteDb(ctx, athleteSplits);
+  await ctx.deleteFromRemoteIfNotInRacetec({
+    compositeKey: AthleteSplitCompositeKey,
+    tableName: "dbo.SplitResults",
+    itemsInRacetec: athleteSplits,
+  });
   return pushResult;
 });
