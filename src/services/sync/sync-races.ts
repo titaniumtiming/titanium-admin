@@ -43,7 +43,7 @@ BEGIN
         raa7.AttribValue AS RaceFacebook
     FROM
         RTSys.dbo.Race r
-    LEFT JOIN RTSys.dbo.RaceAttribute raa1 ON r.RaceId = raa1.RaceId AND raa1.AttribName = 'OrganiserId'
+    LEFT JOIN RTSys.dbo.RaceAttribute raa1 ON r.RaceId = raa1.RaceId AND raa1.AttribName = 'OrgGroupId'
     LEFT JOIN RTSys.dbo.RaceAttribute raa2 ON r.RaceId = raa2.RaceId AND raa2.AttribName = 'ResultsRedirect'
     LEFT JOIN RTSys.dbo.RaceAttribute raa3 ON r.RaceId = raa3.RaceId AND raa3.AttribName = 'ResultsRedirectUrl'
     LEFT JOIN RTSys.dbo.RaceAttribute raa4 ON r.RaceId = raa4.RaceId AND raa4.AttribName = 'RaceWebsite'
